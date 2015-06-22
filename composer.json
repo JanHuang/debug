@@ -1,0 +1,22 @@
+{
+    "name": "fastd/exception",
+    "description": "exception handle component.",
+    "keywords": ["exception", "FastD"],
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "janhuang",
+            "email": "bboyjanhuang@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "php": ">=5.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "FastD\\": "src/FastD"
+        }
+    }
+}
