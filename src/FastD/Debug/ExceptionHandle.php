@@ -31,8 +31,11 @@ class ExceptionHandle
         $handle = Handle::create($exception);
 
         if (null !== Debugger::getLogger()) {
-            $context = $handle->getContext();
-            unset($context['_SERVER']);
+            $context = [];
+            $context['line'] = $exception->getLine();
+            $context['file'] = $exception->getFile();
+            $context['_GET'] = $handle->getContext()['_GET'];
+            $context['_POST'] = $handle->getContext()['_POST'];
             Debugger::getLogger()->error($handle->getMessage(), $context);
         }
 
