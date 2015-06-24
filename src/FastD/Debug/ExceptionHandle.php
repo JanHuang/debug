@@ -30,7 +30,11 @@ class ExceptionHandle
     {
         $handle = Handle::create($exception);
 
-        $this->saveLog($handle);
+        if (null !== Debugger::getLogger()) {
+            $context = $handle->getContext();
+            unset($context['_SERVER']);
+            Debugger::getLogger()->error($handle->getMessage(), $context);
+        }
 
         $this->sendFailResponse($handle);
     }
@@ -45,16 +49,6 @@ class ExceptionHandle
         set_exception_handler([$handle, 'handle']);
 
         return $handle;
-    }
-
-    /**
-     * @param Handle $handle
-     */
-    private function saveLog(Handle $handle)
-    {
-        if (null !== Debugger::getLogger()) {
-            Debugger::getLogger()->save($handle->getMessage());
-        }
     }
 
     /**

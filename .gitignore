@@ -2,3 +2,4 @@
 *.orig
 composer.lock
 /vendor/
+*.log

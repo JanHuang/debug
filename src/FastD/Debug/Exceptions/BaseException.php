@@ -13,7 +13,6 @@
  */
 
 namespace FastD\Debug\Exceptions;
-use FastD\Debug\Debugger;
 
 /**
  * Class BaseException
@@ -31,8 +30,6 @@ class BaseException extends \Exception
 
     protected $context = [];
 
-    protected $templateFile;
-
     public function __construct($message, $statusCode = 500, array $headers = [])
     {
         parent::__construct($message, $statusCode, null);
@@ -41,44 +38,6 @@ class BaseException extends \Exception
             '_POST'    => $_POST,
             '_SERVER'  => $_SERVER,
         ];
-
-        $this->templateFile = (null === ($path = Debugger::getTemplatePath())) ? null : $path . DIRECTORY_SEPARATOR . $statusCode . '.html';
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getTemplateFile()
-    {
-        return $this->templateFile;
-    }
-
-    /**
-     * @param mixed $templateFile
-     * @return $this
-     */
-    public function setTemplateFile($templateFile)
-    {
-        $this->templateFile = $templateFile;
-        return $this;
-    }
-
-    public function getTemplateFileContent()
-    {
-        if (null !== $this->templateFile && file_exists($this->templateFile)) {
-            $content = file_get_contents($this->templateFile);
-            $content = str_replace([
-                '{title}',
-                '{content}',
-                '{trace}',
-            ], [
-                $this->getMessage(),
-                $this->getContent(),
-                $this->getTraceAsString()
-            ], $content);
-            return $content;
-        }
-        return null;
     }
 
     /**
@@ -123,10 +82,6 @@ class BaseException extends \Exception
      */
     public function getContent()
     {
-        if (null !== ($content = $this->getTemplateFileContent())) {
-            return $content;
-        }
-
         $class = get_class($this);
 
         $filename = pathinfo($this->getFile(), PATHINFO_FILENAME) . '.' . pathinfo($this->getFile(), PATHINFO_EXTENSION);

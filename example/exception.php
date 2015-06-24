@@ -18,6 +18,6 @@ include __DIR__ . '/../vendor/autoload.php';
 //
 //restore_exception_handler();
 
-\FastD\Debug\Debugger::enable();
+\FastD\Debug\Debugger::enable(FastD\Logger\Logger::createLogger(__DIR__ . '/demo.log'));
 
-trigger_error('demo');
+throw new \FastD\Debug\Exceptions\BaseException('demo');

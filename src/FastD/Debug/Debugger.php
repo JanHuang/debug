@@ -14,36 +14,29 @@
 
 namespace FastD\Debug;
 
+use FastD\Logger\Logger;
+
 class Debugger
 {
     protected static $enable = false;
 
     protected static $logger;
 
-    protected static $path;
-
     /**
-     * @return DebugLogger
+     * @return Logger
      */
     public static function getLogger()
     {
         return static::$logger;
     }
 
-    public static function getTemplatePath()
-    {
-        return static::$path;
-    }
-
-    public static function enable(DebugLogger $logger = null, $path = null)
+    public static function enable(Logger $logger = null)
     {
         if (static::$enable) {
             return;
         }
 
         static::$logger = $logger;
-
-        static::$path = $path;
 
         static::$enable = true;
 
