@@ -25,7 +25,7 @@ class ErrorHandle
 
     public function handleFatalError(array $error = null)
     {
-        
+
     }
 
     public static function registerHandle()

@@ -27,6 +27,6 @@ class DebugLogger
 
     public function save($content)
     {
-
+        $this->logger->createLogger();
     }
 }
