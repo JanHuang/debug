@@ -20,6 +20,10 @@ class ErrorHandler
 {
     public function handle($code, $message, $file, $line)
     {
+        if (array_key_exists($code, Debug::$statusTexts)) {
+            $code = 500;
+        }
+        
         throw new BaseException($message, $code);
     }
 
