@@ -1,0 +1,19 @@
+<html>
+<head>
+    {header}
+    <script type="text/javascript">
+        $(function() {
+            $('.ajax').click(function() {
+                var container = $(this).parent().html('...');
+                $.get(this.href, function(data) {
+                    container.html(data);
+                });
+                return false;
+            });
+        });
+    </script>
+</head>
+<body>
+{body}
+</body>
+</html>

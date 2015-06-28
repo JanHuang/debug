@@ -23,7 +23,7 @@ class ErrorHandler
         if (array_key_exists($code, Debug::$statusTexts)) {
             $code = 500;
         }
-        
+
         throw new BaseException($message, $code);
     }
 

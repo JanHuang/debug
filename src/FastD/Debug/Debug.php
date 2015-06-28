@@ -14,6 +14,9 @@
 
 namespace FastD\Debug;
 
+use DebugBar\DebugBar;
+use DebugBar\StandardDebugBar;
+
 /**
  * Class Debug
  *
@@ -26,8 +29,6 @@ class Debug extends HttpStatusCode
      */
     public static $enable = false;
 
-    public static $enableBar = true;
-
     /**
      * @var \FastD\Logger\Logger
      */
@@ -37,6 +38,11 @@ class Debug extends HttpStatusCode
      * @var array
      */
     public static $html = [];
+
+    /**
+     * @var DebugBar
+     */
+    public static $debugBar;
 
     /**
      * @param \FastD\Logger\Logger|null $logger
@@ -67,6 +73,11 @@ class Debug extends HttpStatusCode
         ErrorHandler::registerHandle();
     }
 
+    public static function enableDebugBar()
+    {
+        static::$debugBar = new StandardDebugBar();
+    }
+
     public static function html()
     {
         static::$html = [
@@ -76,14 +87,30 @@ class Debug extends HttpStatusCode
         ];
     }
 
-    public static function enableDebugBar($show = true)
+    public static function showDebugBar()
     {
-        static::$enableBar = $show;
-    }
+        if (null === static::$debugBar) {
+            static::enableDebugBar();
+        }
+        $render = static::$debugBar->getJavascriptRenderer()
+            ->setBaseUrl('./debugbar')
+            ->setEnableJqueryNoConflict(false);
 
-    protected static function showDebugBar()
-    {
+        $renderFunc = function () use ($render) {
+            $html = <<<EOF
+<html>
+    <head>
+        {$render->renderHead()}
+    </head>
+    <body>
+    {$render->render()}
+    </body>
+</html>
+EOF;
+            return $html;
+        };
 
+        echo $renderFunc();
     }
 
     /**
@@ -106,6 +133,13 @@ class Debug extends HttpStatusCode
             foreach ($handler->getHeaders() as $name => $value) {
                 header($name.': '.$value, false);
             }
+        }
+
+        if (static::$debugBar) {
+            static::$debugBar['messages']->addMessage($handler->getClass() . ': ' . $handler->getContent());
+            static::$debugBar['messages']->addMessage('File: ' . $handler->getFile());
+            static::$debugBar['messages']->addMessage('Line: ' . $handler->getLine());
+            static::showDebugBar();
         }
 
         echo $handler->getContent();
