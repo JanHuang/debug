@@ -15,6 +15,7 @@
 namespace FastD\Debug;
 
 use FastD\Debug\Exceptions\BaseException;
+use FastD\Debug\Exceptions\JsonException;
 
 /**
  * Class ContextHandler
@@ -49,13 +50,6 @@ class ContextHandler
      */
     public function setContext($context)
     {
-        if (null === $context) {
-            $context = [
-                '_GET'     => $_GET,
-                '_POST'    => $_POST,
-                '_SERVER'  => $_SERVER
-            ];
-        }
         $this->context = $context;
         return $this;
     }
@@ -74,12 +68,6 @@ class ContextHandler
      */
     public function setContent($content)
     {
-        if (null === $content) {
-            $baseException = new BaseException($this->getMessage(), $this->getCode());
-            $content = $baseException->getContent();
-            unset($baseException);
-        }
-
         $this->content = $content;
         return $this;
     }
@@ -134,11 +122,6 @@ class ContextHandler
      */
     public function setHeaders($headers)
     {
-        if (null === $headers) {
-            $baseException = new BaseException($this->getMessage(), $this->getCode());
-            $headers = $baseException->getHeaders();
-            unset($baseException);
-        }
         $this->headers = $headers;
         return $this;
     }
@@ -259,17 +242,34 @@ class ContextHandler
     {
         $e = new static();
 
-        $e->setContext(method_exists($exception, 'getContext') ? $exception->getContext() : null);
+        $getContent = function (BaseException $exception) {
+            if ($exception instanceof JsonException) {
+                return $exception->getContent();
+            }
+            $file = isset(Debug::$html[$exception->getStatusCode()]) ? Debug::$html[$exception->getStatusCode()] : false;
+            if (file_exists($file)) {
+                return file_get_contents($file);
+            }
+            return $exception->getContent();
+        };
+
+        $e->setContext(['_GET' => $_GET, '_POST' => $_POST]);
         $e->setMessage($exception->getMessage());
         $e->setCode($exception->getCode());
-        $e->setStatusCode(method_exists($exception, 'getStatusCode') ? $exception->getStatusCode() : $exception->getCode());
-        $e->setHeaders(method_exists($exception, 'getHeaders') ? $exception->getHeaders() : null);
         $e->setClass(get_class($exception));
         $e->setFile($exception->getFile());
         $e->setLine($exception->getLine());
-        $e->setContent(method_exists($exception, 'getContent') ? $exception->getContent() : null);
         $e->setTrace(debug_backtrace());
+        $e->setPrevious($exception->getPrevious());
+        $e->setStatusCode($exception instanceof BaseException ? $exception->getStatusCode() : $exception->getCode());
+        $e->setHeaders($exception instanceof BaseException ? $exception->getHeaders() : ['Content-Type: text/html; charset=utf-8;']);
+        $e->setContent($exception instanceof BaseException ? $getContent($exception) : $exception->getMessage());
 
         return $e;
+    }
+
+    public function __toString()
+    {
+        return '';
     }
 }

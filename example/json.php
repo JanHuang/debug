@@ -16,4 +16,4 @@ include __DIR__ . '/../vendor/autoload.php';
 
 \FastD\Debug\Debug::enable();
 
-throw new \FastD\Debug\Exceptions\BaseException('message');
+throw new \FastD\Debug\Exceptions\JsonException('message');

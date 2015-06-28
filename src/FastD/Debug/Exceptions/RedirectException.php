@@ -14,25 +14,36 @@
 
 namespace FastD\Debug\Exceptions;
 
+use FastD\Debug\Debug;
+
 class RedirectException extends BaseException
 {
     /**
+     * Unauthorization
+     *
+     * @param string $message
      * @param string $url
      * @param int    $code
      * @param int    $timeout
      */
-    public function __construct($url, $code = 500, $timeout = 3)
+    public function __construct($message, $url, $code = 403, $timeout = 3)
     {
-        parent::__construct('', $code, [
-            'Location' => $url,
-        ]);
-    }
+        parent::__construct($message, $code);
 
-    /**
-     * @return string
-     */
-    public function getContent()
-    {
-        return $this->getMessage();
+        $content = file_get_contents(Debug::$html[302]);
+
+        $content = str_replace([
+            '{title}',
+            '{content}',
+            '{timeout}',
+            '{url}'
+        ], [
+            $this->getMessage(),
+            $this->getMessage(),
+            $timeout,
+            $url,
+        ], $content);
+
+        $this->setContent($content);
     }
 }

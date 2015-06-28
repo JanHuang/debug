@@ -44,14 +44,6 @@ class JsonException extends BaseException
             $response['documentation'] = $documentation;
         }
 
-        parent::__construct(json_encode($response, JSON_UNESCAPED_UNICODE), $code);
-    }
-
-    /**
-     * @return string
-     */
-    public function getContent()
-    {
-        return $this->getMessage();
+        parent::__construct(json_encode($response, JSON_UNESCAPED_UNICODE), $code, $this->headers);
     }
 }

@@ -14,57 +14,100 @@
 
 namespace FastD\Debug;
 
-use FastD\Logger\Logger;
-
-class Debug
+/**
+ * Class Debug
+ *
+ * @package FastD\Debug
+ */
+class Debug extends HttpStatusCode
 {
-    protected static $enable = false;
+    /**
+     * @var bool
+     */
+    public static $enable = false;
 
-    protected static $logger;
+    public static $enableBar = true;
 
     /**
-     * @return Logger
+     * @var \FastD\Logger\Logger
      */
-    public static function getLogger()
-    {
-        return static::$logger;
-    }
+    public static $logger;
 
-    public static function enable(Logger $logger = null)
+    /**
+     * @var array
+     */
+    public static $html = [];
+
+    /**
+     * @param \FastD\Logger\Logger|null $logger
+     * @param array                     $config
+     */
+    public static function enable(\FastD\Logger\Logger $logger = null, array $config = [])
     {
         if (static::$enable) {
             return;
         }
 
+        error_reporting(E_ALL);
+
         static::$logger = $logger;
 
         static::$enable = true;
 
-        error_reporting(E_ALL);
+        static::html();
+
+        if (!empty($config)) {
+            foreach ($config as $code => $value) {
+                static::$html[$code] = $value;
+            }
+        }
 
         ExceptionHandler::registerHandle();
 
         ErrorHandler::registerHandle();
     }
 
-    public static function output(ContextHandler $context)
+    public static function html()
     {
-        if (null !== Debug::getLogger()) {
+        static::$html = [
+            Debug::HTTP_NOT_FOUND               => __DIR__ . '/Html/404.html',
+            Debug::HTTP_INTERNAL_SERVER_ERROR   => __DIR__ . '/Html/500.html',
+            Debug::HTTP_FOUND                   => __DIR__ . '/Html/302.html',
+        ];
+    }
+
+    public static function enableDebugBar($show = true)
+    {
+        static::$enableBar = $show;
+    }
+
+    protected static function showDebugBar()
+    {
+
+    }
+
+    /**
+     * @param ContextHandler $handler
+     * @return void
+     */
+    public static function output(ContextHandler $handler)
+    {
+        if (null !== static::$logger) {
             $context = [];
-            $context['line'] = $context->getLine();
-            $context['file'] = $context->getFile();
-            $context['_GET'] = $context->getContext()['_GET'];
-            $context['_POST'] = $context->getContext()['_POST'];
-            Debug::getLogger()->error($context->getMessage(), $context);
+            $context['line'] = $handler->getLine();
+            $context['file'] = $handler->getFile();
+            $context['_GET'] = $handler->getContext()['_GET'];
+            $context['_POST'] = $handler->getContext()['_POST'];
+            static::$logger->error($handler->getMessage(), $context);
         }
 
         if (!headers_sent()) {
-            header(sprintf('HTTP/1.1 %s', $context->getStatusCode()));
-            foreach ($context->getHeaders() as $name => $value) {
+            header(sprintf('HTTP/1.1 %s', $handler->getStatusCode()));
+            foreach ($handler->getHeaders() as $name => $value) {
                 header($name.': '.$value, false);
             }
         }
 
-        echo $context->getContent();
+        echo $handler->getContent();
     }
 }

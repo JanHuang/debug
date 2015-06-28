@@ -2,8 +2,8 @@
 /**
  * Created by PhpStorm.
  * User: janhuang
- * Date: 15/6/28
- * Time: 下午5:17
+ * Date: 15/6/23
+ * Time: 上午9:43
  * Github: https://www.github.com/janhuang
  * Coding: https://www.coding.net/janhuang
  * SegmentFault: http://segmentfault.com/u/janhuang
@@ -16,4 +16,4 @@ include __DIR__ . '/../vendor/autoload.php';
 
 \FastD\Debug\Debug::enable();
 
-throw new \FastD\Debug\Exceptions\BaseException('message');
+throw new \FastD\Debug\Exceptions\RedirectException('fuck you error', 'http://www.baidu.com');
