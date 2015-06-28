@@ -12,16 +12,16 @@
  * WebSite: http://www.janhuang.me
  */
 
-namespace FastD\Debug\Handle;
+namespace FastD\Debug;
 
 use FastD\Debug\Exceptions\BaseException;
 
 /**
- * Class Handle
+ * Class ContextHandler
  *
- * @package FastD\Debug\Handle
+ * @package FastD\Debug
  */
-class Handle
+class ContextHandler
 {
     private $message;
     private $code;
@@ -253,7 +253,7 @@ class Handle
 
     /**
      * @param \Exception $exception
-     * @return Handle
+     * @return $this
      */
     public static function create(\Exception $exception)
     {

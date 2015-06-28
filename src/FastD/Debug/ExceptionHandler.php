@@ -2,8 +2,8 @@
 /**
  * Created by PhpStorm.
  * User: janhuang
- * Date: 15/6/24
- * Time: 上午11:54
+ * Date: 15/6/23
+ * Time: 下午11:53
  * Github: https://www.github.com/janhuang
  * Coding: https://www.coding.net/janhuang
  * SegmentFault: http://segmentfault.com/u/janhuang
@@ -14,27 +14,29 @@
 
 namespace FastD\Debug;
 
-use FastD\Debug\Exceptions\BaseException;
-
-class ErrorHandle
+/**
+ * Class ExceptionHandle
+ *
+ * @package FastD\Debug
+ */
+class ExceptionHandler
 {
-    public function handle($code, $message, $file, $line)
+    /**
+     * @param \Exception $exception
+     */
+    public function handle(\Exception $exception)
     {
-        throw new BaseException($message, $code);
+        Debug::output(ContextHandler::create($exception));
     }
 
-    public function handleFatalError(array $error = null)
-    {
-
-    }
-
+    /**
+     * @return static
+     */
     public static function registerHandle()
     {
         $handle = new static();
 
-        set_error_handler([$handle, 'handle']);
-
-        register_shutdown_function([$handle, 'handleFatalError']);
+        set_exception_handler([$handle, 'handle']);
 
         return $handle;
     }

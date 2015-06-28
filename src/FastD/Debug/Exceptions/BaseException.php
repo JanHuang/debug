@@ -38,6 +38,7 @@ class BaseException extends \Exception
             '_POST'    => $_POST,
             '_SERVER'  => $_SERVER,
         ];
+        $this->setHeaders($headers);
     }
 
     /**
@@ -61,6 +62,13 @@ class BaseException extends \Exception
     public function getStatusCode()
     {
         return $this->getCode();
+    }
+
+    public function addHeaders($name, $value)
+    {
+        $this->headers[$name] = $value;
+
+        return $this;
     }
 
     public function setHeaders(array $headers)

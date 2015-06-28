@@ -25,16 +25,26 @@ class JsonException extends BaseException
      * @var array
      */
     protected $headers = [
-        'Content-Type' => 'application/json; charset=UTF-8;',
+        'Content-Type' => 'application/json; charset=utf-8;',
     ];
 
     /**
-     * @param array $message
-     * @param int   $code
+     * @param string $message
+     * @param int    $code
+     * @param null   $documentation
      */
-    public function __construct(array $message, $code = 500)
+    public function __construct($message, $code = 500, $documentation = null)
     {
-        parent::__construct(json_encode($message, JSON_UNESCAPED_UNICODE), $code);
+        $response = [
+            'code' => $code,
+            'error' => $message,
+        ];
+
+        if (null !== $documentation) {
+            $response['documentation'] = $documentation;
+        }
+
+        parent::__construct(json_encode($response, JSON_UNESCAPED_UNICODE), $code);
     }
 
     /**
