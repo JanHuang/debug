@@ -16,6 +16,7 @@ namespace FastD\Debug;
 
 use DebugBar\DebugBar;
 use DebugBar\StandardDebugBar;
+use Monolog\Logger;
 
 /**
  * Class Debug
@@ -30,7 +31,7 @@ class Debug extends HttpStatusCode
     public static $enable = false;
 
     /**
-     * @var \FastD\Logger\Logger
+     * @var Logger
      */
     public static $logger;
 
@@ -45,10 +46,10 @@ class Debug extends HttpStatusCode
     public static $debugBar;
 
     /**
-     * @param \FastD\Logger\Logger|null $logger
+     * @param Logger $logger
      * @param array                     $config
      */
-    public static function enable(\FastD\Logger\Logger $logger = null, array $config = [])
+    public static function enable(Logger $logger = null, array $config = [])
     {
         if (static::$enable) {
             return;
@@ -73,11 +74,6 @@ class Debug extends HttpStatusCode
         ErrorHandler::registerHandle();
     }
 
-    public static function enableDebugBar()
-    {
-        static::$debugBar = new StandardDebugBar();
-    }
-
     public static function html()
     {
         static::$html = [
@@ -87,11 +83,18 @@ class Debug extends HttpStatusCode
         ];
     }
 
-    public static function showDebugBar()
+    public static function showDebugBar(array $context = [])
     {
-        if (null === static::$debugBar) {
-            static::enableDebugBar();
+        if (null !== static::$debugBar) {
+            return;
         }
+
+        static::$debugBar = new StandardDebugBar();
+
+        foreach ($context as $value) {
+            static::$debugBar['messages']->addMessage($value);
+        }
+
         $render = static::$debugBar->getJavascriptRenderer()
             ->setBaseUrl('./debugbar')
             ->setEnableJqueryNoConflict(false);
@@ -125,7 +128,7 @@ EOF;
             $context['file'] = $handler->getFile();
             $context['_GET'] = $handler->getContext()['_GET'];
             $context['_POST'] = $handler->getContext()['_POST'];
-            static::$logger->error($handler->getMessage(), $context);
+            static::$logger->addError($handler->getMessage(), $context);
         }
 
         if (!headers_sent()) {
@@ -133,13 +136,6 @@ EOF;
             foreach ($handler->getHeaders() as $name => $value) {
                 header($name.': '.$value, false);
             }
-        }
-
-        if (static::$debugBar) {
-            static::$debugBar['messages']->addMessage($handler->getClass() . ': ' . $handler->getContent());
-            static::$debugBar['messages']->addMessage('File: ' . $handler->getFile());
-            static::$debugBar['messages']->addMessage('Line: ' . $handler->getLine());
-            static::showDebugBar();
         }
 
         echo $handler->getContent();

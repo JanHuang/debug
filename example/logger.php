@@ -14,7 +14,9 @@
 
 include __DIR__ . '/../vendor/autoload.php';
 
-\FastD\Debug\Debug::enable(new \FastD\Logger\Logger(__DIR__ . '/demo.log'));
+$logger = new \FastD\Logger\Logger();
+
+\FastD\Debug\Debug::enable($logger->createLogger(__DIR__ . '/demo.log'));
 
 throw new \FastD\Debug\Exceptions\BaseException('demo');
 

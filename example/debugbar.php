@@ -14,7 +14,7 @@
 
 include __DIR__ . '/../vendor/autoload.php';
 
-\FastD\Debug\Debug::enableDebugBar();
+\FastD\Debug\Debug::showDebugBar(['shit']);
 
 \FastD\Debug\Debug::enable();
 
