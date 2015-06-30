@@ -83,7 +83,7 @@ class Debug extends HttpStatusCode
         ];
     }
 
-    public static function showDebugBar(array $context = [])
+    public static function showDebugBar($resources = './debugbar', array $context = [])
     {
         if (null !== static::$debugBar) {
             return;
@@ -96,7 +96,7 @@ class Debug extends HttpStatusCode
         }
 
         $render = static::$debugBar->getJavascriptRenderer()
-            ->setBaseUrl('./debugbar')
+            ->setBaseUrl($resources)
             ->setEnableJqueryNoConflict(false);
 
         $renderFunc = function () use ($render) {
