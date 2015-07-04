@@ -242,16 +242,17 @@ class ContextHandler
     {
         $e = new static();
 
-        $getContent = function (BaseException $exception) {
+        $getContent = function (\Exception $exception) {
             if ($exception instanceof JsonException) {
                 return $exception->getContent();
             }
-            $file = isset(Debug::$html[$exception->getStatusCode()]) ? Debug::$html[$exception->getStatusCode()] : false;
+            $file = isset(Debug::$html[$exception->getCode()]) ? Debug::$html[$exception->getCode()] : false;
             if (file_exists($file)) {
                 return file_get_contents($file);
             }
-            return $exception->getContent();
+            return $exception->getMessage();
         };
+        $message = $getContent($exception);
 
         $e->setContext(['_GET' => $_GET, '_POST' => $_POST]);
         $e->setMessage($exception->getMessage());
@@ -261,9 +262,9 @@ class ContextHandler
         $e->setLine($exception->getLine());
         $e->setTrace(debug_backtrace());
         $e->setPrevious($exception->getPrevious());
-        $e->setStatusCode($exception instanceof BaseException ? $exception->getStatusCode() : $exception->getCode());
+        $e->setStatusCode($exception->getCode());
         $e->setHeaders($exception instanceof BaseException ? $exception->getHeaders() : ['Content-Type: text/html; charset=utf-8;']);
-        $e->setContent($exception instanceof BaseException ? $getContent($exception) : $exception->getMessage());
+        $e->setContent($message);
 
         return $e;
     }
