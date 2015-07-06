@@ -74,6 +74,9 @@ class Debug extends HttpStatusCode
         ErrorHandler::registerHandle();
     }
 
+    /**
+     * @return void;
+     */
     public static function html()
     {
         static::$html = [
@@ -83,22 +86,32 @@ class Debug extends HttpStatusCode
         ];
     }
 
+    /**
+     * @return DebugBar
+     */
     private static function getDebugBar()
     {
-        if (null !== static::$debugBar) {
-            return static::$debugBar;
+        if (null === static::$debugBar) {
+            static::$debugBar = new StandardDebugBar();
         }
-
-        static::$debugBar = new StandardDebugBar();
 
         return static::$debugBar;
     }
 
+    /**
+     * @param $vars
+     */
     public static function dump($vars)
     {
-        static::getDebugBar()['message']->addMessage($vars);
+        static::$debugBar = static::getDebugBar();
+
+        static::$debugBar['messages']->addMessage($vars);
     }
 
+    /**
+     * @param string $resources
+     * @param array  $context
+     */
     public static function showDebugBar($resources = './debugbar', array $context = [])
     {
         static::$debugBar = static::getDebugBar();
@@ -146,7 +159,7 @@ EOF;
         if (!headers_sent()) {
             header(sprintf('HTTP/1.1 %s', $handler->getStatusCode()));
             foreach ($handler->getHeaders() as $name => $value) {
-                header($name.': '.$value, false);
+                header($name . ': ' . $value, false);
             }
         }
 
