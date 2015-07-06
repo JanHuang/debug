@@ -83,13 +83,25 @@ class Debug extends HttpStatusCode
         ];
     }
 
-    public static function showDebugBar($resources = './debugbar', array $context = [])
+    private static function getDebugBar()
     {
         if (null !== static::$debugBar) {
-            return;
+            return static::$debugBar;
         }
 
         static::$debugBar = new StandardDebugBar();
+
+        return static::$debugBar;
+    }
+
+    public static function dump($vars)
+    {
+        static::getDebugBar()['message']->addMessage($vars);
+    }
+
+    public static function showDebugBar($resources = './debugbar', array $context = [])
+    {
+        static::$debugBar = static::getDebugBar();
 
         foreach ($context as $value) {
             static::$debugBar['messages']->addMessage($value);
