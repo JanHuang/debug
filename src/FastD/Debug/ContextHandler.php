@@ -246,7 +246,8 @@ class ContextHandler
             if ($exception instanceof JsonException) {
                 return $exception->getContent();
             }
-            $file = isset(Debug::$html[$exception->getCode()]) ? Debug::$html[$exception->getCode()] : false;
+            $statusCode = array_key_exists($exception->getCode(), Debug::$html) ? $exception->getCode() : 500;
+            $file = Debug::$html[$statusCode];
             if (file_exists($file)) {
                 return file_get_contents($file);
             }

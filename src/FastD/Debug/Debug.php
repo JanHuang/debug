@@ -116,9 +116,7 @@ class Debug extends HttpStatusCode
     {
         static::$debugBar = static::getDebugBar();
 
-        foreach ($context as $value) {
-            static::$debugBar['messages']->addMessage($value);
-        }
+        static::$debugBar['messages']->addMessage($context);
 
         $render = static::$debugBar->getJavascriptRenderer()
             ->setBaseUrl($resources)
@@ -149,8 +147,9 @@ EOF;
     {
         if (null !== static::$logger) {
             $context = [];
-            $context['line'] = $handler->getLine();
-            $context['file'] = $handler->getFile();
+            $context['Code'] = $handler->getCode();
+            $context['Line'] = $handler->getLine();
+            $context['File'] = $handler->getFile();
             $context['_GET'] = $handler->getContext()['_GET'];
             $context['_POST'] = $handler->getContext()['_POST'];
             static::$logger->addError($handler->getMessage(), $context);
