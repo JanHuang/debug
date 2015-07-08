@@ -23,13 +23,11 @@ class RedirectException extends BaseException
      *
      * @param string $message
      * @param string $url
-     * @param int    $code
      * @param int    $timeout
+     * @param int    $code
      */
-    public function __construct($message, $url, $code = 403, $timeout = 3)
+    public function __construct($message, $url, $timeout = 3, $code = 403)
     {
-        parent::__construct($message, $code);
-
         $content = file_get_contents(Debug::$html[302]);
 
         $content = str_replace([
@@ -38,12 +36,14 @@ class RedirectException extends BaseException
             '{timeout}',
             '{url}'
         ], [
-            $this->getMessage(),
-            $this->getMessage(),
+            $message,
+            $message,
             $timeout,
             $url,
         ], $content);
 
         $this->setContent($content);
+
+        parent::__construct($content, $code);
     }
 }
