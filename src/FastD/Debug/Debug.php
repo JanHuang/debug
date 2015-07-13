@@ -120,7 +120,7 @@ class Debug extends HttpStatusCode
 
         $render = static::$debugBar->getJavascriptRenderer()
             ->setBaseUrl($resources)
-            ->setEnableJqueryNoConflict(false);
+            ->setEnableJqueryNoConflict(true);
 
         $renderFunc = function () use ($render) {
             $html = <<<EOF
