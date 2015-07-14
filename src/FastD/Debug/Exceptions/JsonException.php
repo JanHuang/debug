@@ -29,21 +29,13 @@ class JsonException extends BaseException
     ];
 
     /**
-     * @param string $message
+     * @param array  $message
      * @param int    $code
-     * @param null   $documentation
      */
-    public function __construct($message, $code = 500, $documentation = null)
+    public function __construct(array $message, $code = 500)
     {
-        $response = [
-            'code' => $code,
-            'error' => $message,
-        ];
+        $message['code'] = $code;
 
-        if (null !== $documentation) {
-            $response['documentation'] = $documentation;
-        }
-
-        parent::__construct(json_encode($response, JSON_UNESCAPED_UNICODE), $code, $this->headers);
+        parent::__construct(json_encode($message, JSON_UNESCAPED_UNICODE), $code, $this->headers);
     }
 }
