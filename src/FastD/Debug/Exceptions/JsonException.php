@@ -34,8 +34,6 @@ class JsonException extends BaseException
      */
     public function __construct(array $message, $code = 500)
     {
-        $message['code'] = $code;
-
         parent::__construct(json_encode($message, JSON_UNESCAPED_UNICODE), $code, $this->headers);
     }
 }
