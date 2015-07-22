@@ -162,6 +162,6 @@ EOF;
             }
         }
 
-        echo $handler->getContent();
+        echo $handler->getMessage();
     }
 }
