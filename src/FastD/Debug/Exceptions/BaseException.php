@@ -46,7 +46,7 @@ class BaseException extends \Exception
 
         $this->setContent($message);
 
-        $this->setHeaders($headers);
+        $this->setHeaders(array_merge($this->headers, $headers));
     }
 
     /**
