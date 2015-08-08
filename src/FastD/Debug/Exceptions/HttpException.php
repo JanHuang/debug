@@ -23,13 +23,20 @@ class HttpException extends \ErrorException implements HttpExceptionInterface
 {
     protected $statusCode;
 
+    protected $headers = [
+        'Content-Type' => 'text/html; charset=utf-8'
+    ];
+
     /**
      * @param string $message
      * @param int    $code
+     * @param array  $headers
      */
-    public function __construct($message, $code = HttpExceptionInterface::HTTP_SERVER_INTERNAL_ERROR)
+    public function __construct($message, $code = HttpExceptionInterface::HTTP_SERVER_INTERNAL_ERROR, array $headers = [])
     {
         $this->statusCode = $code;
+        $this->headers = array_merge($this->headers, $headers);
+        $message = is_array($message) ? json_encode($message, JSON_UNESCAPED_UNICODE) : $message;
         parent::__construct($message, $code, 1);
     }
 
@@ -50,8 +57,6 @@ class HttpException extends \ErrorException implements HttpExceptionInterface
      */
     public function getHeaders()
     {
-        return [
-            'Content-Type' => 'text/html; charset=utf-8'
-        ];
+        return $this->headers;
     }
 }

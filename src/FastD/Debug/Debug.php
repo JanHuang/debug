@@ -242,7 +242,7 @@ EOF;
 
         echo $wrapper;
 
-        if ($this->isDisplay() && !$this->isShowDebugBar()) {
+        if ($this->isDisplay() && !$this->isShowDebugBar() && !$wrapper->isApplicationJson()) {
             $this->showDebugBar();
         }
     }

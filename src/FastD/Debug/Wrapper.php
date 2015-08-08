@@ -33,6 +33,11 @@ class Wrapper
     private $style;
 
     /**
+     * @var bool
+     */
+    private $isJson;
+
+    /**
      * @return string
      */
     public function getMessage()
@@ -87,6 +92,20 @@ class Wrapper
     {
         $this->exception = $exception;
         $this->style = new Style($this);
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isApplicationJson()
+    {
+        if (null === $this->isJson) {
+            if ($this->exception instanceof HttpExceptionInterface) {
+                $this->isJson = false === strpos($this->exception->getHeaders()['Content-Type'], 'application/json') ? false : true;
+            }
+        }
+
+        return $this->isJson;
     }
 
     /**
@@ -151,6 +170,10 @@ class Wrapper
 EOF;
     }
 
+    /**
+     * @param $html
+     * @return $this
+     */
     public function custom($html)
     {
         $this->style->setHtml($html);

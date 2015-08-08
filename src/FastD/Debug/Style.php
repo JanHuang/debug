@@ -50,6 +50,10 @@ class Style
             return $this->html;
         }
 
+        if ($this->wrapper->isApplicationJson()) {
+            return $this->wrapper->getMessage();
+        }
+
         $title = $this->wrapper->getTitle();
         $style = $this->getStyleSheet();
         $content = $this->wrapper->getContent();
