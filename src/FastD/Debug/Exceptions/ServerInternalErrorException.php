@@ -14,31 +14,10 @@
 
 namespace FastD\Debug\Exceptions;
 
-class ServerInternalErrorException extends \ErrorException implements HttpExceptionInterface
+class ServerInternalErrorException extends HttpException
 {
-    public function __construct($message, $file = __FILE__, $line = __LINE__)
+    public function __construct($message, $code = HttpExceptionInterface::HTTP_SERVER_INTERNAL_ERROR)
     {
-        parent::__construct($message, HttpExceptionInterface::HTTP_SERVER_INTERNAL_ERROR, 1, $file, $line);
-    }
-    /**
-     * Returns the status code.
-     *
-     * @return int An HTTP response status code
-     */
-    public function getStatusCode()
-    {
-        return HttpExceptionInterface::HTTP_SERVER_INTERNAL_ERROR;
-    }
-
-    /**
-     * Returns response headers.
-     *
-     * @return array Response headers
-     */
-    public function getHeaders()
-    {
-        return [
-            'Content-Type' => 'text/html; charset=utf-8'
-        ];
+        parent::__construct($message, $code);
     }
 }
