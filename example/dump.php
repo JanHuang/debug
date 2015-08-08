@@ -2,8 +2,8 @@
 /**
  * Created by PhpStorm.
  * User: janhuang
- * Date: 15/6/28
- * Time: 下午5:17
+ * Date: 15/8/8
+ * Time: 下午12:03
  * Github: https://www.github.com/janhuang
  * Coding: https://www.coding.net/janhuang
  * SegmentFault: http://segmentfault.com/u/janhuang
@@ -14,6 +14,8 @@
 
 include __DIR__ . '/../vendor/autoload.php';
 
-\FastD\Debug\Debug::enable(null, [500=>null]);
+$debug = \FastD\Debug\Debug::enable();
 
-throw new \FastD\Debug\Exceptions\JsonException(['message' => 'message']);
+$debug->dump(['name' => 'janhuang']);
+
+$debug->showDebugBar();

@@ -33,6 +33,10 @@ class Debug
 
     protected $errorHandle;
 
+    protected $debugBar;
+
+    protected $showDebugBar = false;
+
     public function __construct($display = true)
     {
         $this->display = $display;
@@ -67,6 +71,14 @@ class Debug
     }
 
     /**
+     * @return boolean
+     */
+    public function isShowDebugBar()
+    {
+        return $this->showDebugBar;
+    }
+
+    /**
      * @param bool|true $display
      * @return Debug
      */
@@ -84,13 +96,13 @@ class Debug
     /**
      * @return DebugBar
      */
-    private static function getDebugBar()
+    public function getDebugBar()
     {
-        if (null === static::$debugBar) {
-            static::$debugBar = new StandardDebugBar();
+        if (null === $this->debugBar) {
+            $this->debugBar = new StandardDebugBar();
         }
 
-        return static::$debugBar;
+        return $this->debugBar;
     }
 
     /**
@@ -98,22 +110,22 @@ class Debug
      */
     public function dump($vars)
     {
-        static::$debugBar = static::getDebugBar();
-
-        static::$debugBar['messages']->addMessage($vars);
+        $this->getDebugBar()['messages']->addMessage($vars);
     }
 
     /**
-     * @param string $resources
      * @param array  $context
+     * @param string $resources
      */
-    public static function showDebugBar($resources = './debugbar', array $context = [])
+    public function showDebugBar(array $context = [], $resources = 'http://resources.fast-d.cn/debugbar')
     {
-        static::$debugBar = static::getDebugBar();
+        $this->showDebugBar = true;
 
-        static::$debugBar['messages']->addMessage($context);
+        $debagBar = $this->getDebugBar();
 
-        $render = static::$debugBar->getJavascriptRenderer()
+        $debagBar['messages']->addMessage($context);
+
+        $render = $debagBar->getJavascriptRenderer()
             ->setBaseUrl($resources)
             ->setEnableJqueryNoConflict(true);
 
@@ -138,11 +150,15 @@ EOF;
     {
         if (!headers_sent()) {
             header(sprintf('HTTP/1.1 %s', $wrapper->getStatusCode()));
-//            foreach ($handler->getHeaders() as $name => $value) {
-//                header($name . ': ' . $value, false);
-//            }
+            foreach ($wrapper->getHeaders() as $name => $value) {
+                header($name . ': ' . $value, false);
+            }
         }
 
         echo $wrapper;
+
+        if ($this->isDisplay() && !$this->isShowDebugBar()) {
+            $this->showDebugBar();
+        }
     }
 }
