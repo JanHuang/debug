@@ -59,4 +59,14 @@ class HttpException extends \ErrorException implements HttpExceptionInterface
     {
         return $this->headers;
     }
+
+    public function setFile($file)
+    {
+        $this->file = $file;
+    }
+
+    public function setLine($line)
+    {
+        $this->line = $line;
+    }
 }

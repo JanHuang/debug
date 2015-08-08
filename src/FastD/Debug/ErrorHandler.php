@@ -14,13 +14,18 @@
 
 namespace FastD\Debug;
 
+use FastD\Debug\Exceptions\HttpExceptionInterface;
 use FastD\Debug\Exceptions\ServerInternalErrorException;
 
 class ErrorHandler
 {
     public function handle($code, $message, $file, $line)
     {
-        throw new ServerInternalErrorException($message, $file, $line);
+        unset($code);
+        $serverInternalErrorException = new ServerInternalErrorException($message);
+        $serverInternalErrorException->setFile($file);
+        $serverInternalErrorException->setLine($line);
+        throw $serverInternalErrorException;
     }
 
     public function handleFatalError(array $error = null)
