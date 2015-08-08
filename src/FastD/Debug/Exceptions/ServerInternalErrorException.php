@@ -16,7 +16,7 @@ namespace FastD\Debug\Exceptions;
 
 class ServerInternalErrorException extends \ErrorException implements HttpExceptionInterface
 {
-    public function __construct($message, $file, $line)
+    public function __construct($message, $file = __FILE__, $line = __LINE__)
     {
         parent::__construct($message, HttpExceptionInterface::HTTP_SERVER_INTERNAL_ERROR, 1, $file, $line);
     }

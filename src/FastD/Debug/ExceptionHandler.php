@@ -41,7 +41,12 @@ class ExceptionHandler
      */
     public function handle(\Exception $exception)
     {
-        $this->debug->output(new Wrapper($exception));
+        $wrapper = new Wrapper($exception);
+        if (!$this->debug->isDisplay()) {
+            $content = false !== ($content = $this->debug->getCustom($wrapper->getStatusCode())) ? $content : 'Whool!';
+            $wrapper->custom($content);
+        }
+        $this->debug->output($wrapper);
     }
 
     /**

@@ -151,6 +151,13 @@ class Wrapper
 EOF;
     }
 
+    public function custom($html)
+    {
+        $this->style->setHtml($html);
+
+        return $this;
+    }
+
     /**
      * @return string
      */

@@ -26,6 +26,8 @@ class Style
      */
     private $wrapper;
 
+    protected $html;
+
     /**
      * @param Wrapper $wrapper
      */
@@ -34,11 +36,20 @@ class Style
         $this->wrapper = $wrapper;
     }
 
+    public function setHtml($html)
+    {
+        $this->html = $html;
+    }
+
     /**
      * @return string
      */
     public function getHtml()
     {
+        if (!empty($this->html)) {
+            return $this->html;
+        }
+
         $title = $this->wrapper->getTitle();
         $style = $this->getStyleSheet();
         $content = $this->wrapper->getContent();

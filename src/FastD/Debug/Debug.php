@@ -25,21 +25,55 @@ use Monolog\Logger;
  */
 class Debug
 {
+    /**
+     * @var Debug
+     */
     protected static $debug;
 
+    /**
+     * @var bool
+     */
     protected $display = true;
 
+    /**
+     * @var ExceptionHandler
+     */
     protected $exceptionHandle;
 
+    /**
+     * @var ErrorHandler
+     */
     protected $errorHandle;
 
+    /**
+     * @var DebugBar
+     */
     protected $debugBar;
 
+    /**
+     * @var bool
+     */
     protected $showDebugBar = false;
 
-    public function __construct($display = true)
+    /**
+     * @var array
+     */
+    protected $custom = [];
+
+    /**
+     * @var Logger
+     */
+    protected $logger;
+
+    /**
+     * @param bool|true   $display
+     * @param Logger|null $logger
+     */
+    public function __construct($display = true, Logger $logger = null)
     {
         $this->display = $display;
+
+        $this->logger = $logger;
 
         $this->exceptionHandle = ExceptionHandler::registerHandle($this);
 
@@ -79,16 +113,55 @@ class Debug
     }
 
     /**
-     * @param bool|true $display
+     * @param $code
+     * @param $content
+     * @return $this
+     */
+    public function setCustom($code, $content)
+    {
+        $this->custom[$code] = $content;
+
+        return $this;
+    }
+
+    /**
+     * @param $code
+     * @return bool|string
+     */
+    public function getCustom($code)
+    {
+        if (!$this->hasCustom($code)) {
+            return false;
+        }
+
+        if (file_exists($this->custom[$code])) {
+            return file_get_contents($this->custom[$code]);
+        }
+
+        return $this->custom[$code];
+    }
+
+    /**
+     * @param $code
+     * @return bool
+     */
+    public function hasCustom($code)
+    {
+        return isset($this->custom[$code]) ? $this->custom[$code] : false;
+    }
+
+    /**
+     * @param bool|true   $display
+     * @param Logger|null $logger
      * @return Debug
      */
-    public static function enable($display = true)
+    public static function enable($display = true, Logger $logger = null)
     {
         if (static::$debug instanceof Debug) {
             return static::$debug;
         }
 
-        static::$debug = new static($display);
+        static::$debug = new static($display, $logger);
 
         return static::$debug;
     }
@@ -146,6 +219,9 @@ EOF;
         echo $renderFunc();
     }
 
+    /**
+     * @param Wrapper $wrapper
+     */
     public function output(Wrapper $wrapper)
     {
         if (!headers_sent()) {
@@ -153,6 +229,15 @@ EOF;
             foreach ($wrapper->getHeaders() as $name => $value) {
                 header($name . ': ' . $value, false);
             }
+        }
+
+        if ($this->logger instanceof Logger && !$this->isDisplay()) {
+            $this->logger->addError($wrapper->getMessage(), [
+                'FILE: ' => $wrapper->getFile(),
+                'LINE: ' => $wrapper->getFile(),
+                'GET: ' => $_GET,
+                'POST: ' => $_POST,
+            ]);
         }
 
         echo $wrapper;
