@@ -15,29 +15,41 @@
 namespace FastD\Debug;
 
 /**
- * Class ExceptionHandle
+ * Class ExceptionHandler
  *
  * @package FastD\Debug
  */
 class ExceptionHandler
 {
     /**
+     * @var Debug
+     */
+    protected $debug;
+
+    /**
+     * @param Debug $debug
+     */
+    public function __construct(Debug $debug)
+    {
+        $this->debug = $debug;
+
+        set_exception_handler([$this, 'handle']);
+    }
+
+    /**
      * @param \Exception $exception
      */
     public function handle(\Exception $exception)
     {
-        Debug::output(ContextHandler::create($exception));
+        $this->debug->output(new Wrapper($exception));
     }
 
     /**
+     * @param Debug $debug
      * @return static
      */
-    public static function registerHandle()
+    public static function registerHandle(Debug $debug)
     {
-        $handle = new static();
-
-        set_exception_handler([$handle, 'handle']);
-
-        return $handle;
+        return new static($debug);
     }
 }

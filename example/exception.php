@@ -12,8 +12,12 @@
  * WebSite: http://www.janhuang.me
  */
 
+
 include __DIR__ . '/../vendor/autoload.php';
 
-\FastD\Debug\Debug::enable();
 
-throw new \FastD\Debug\Exceptions\BaseException('message');
+$debug = \FastD\Debug\Debug::enable();
+
+
+
+throw new Exception('demo');

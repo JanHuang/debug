@@ -23,67 +23,62 @@ use Monolog\Logger;
  *
  * @package FastD\Debug
  */
-class Debug extends HttpStatusCode
+class Debug
 {
-    /**
-     * @var bool
-     */
-    public static $enable = false;
+    protected static $debug;
 
-    /**
-     * @var Logger
-     */
-    public static $logger;
+    protected $display = true;
 
-    /**
-     * @var array
-     */
-    public static $html = [];
+    protected $exceptionHandle;
 
-    /**
-     * @var DebugBar
-     */
-    public static $debugBar;
+    protected $errorHandle;
 
-    /**
-     * @param Logger $logger
-     * @param array                     $config
-     */
-    public static function enable(Logger $logger = null, array $config = [])
+    public function __construct($display = true)
     {
-        if (static::$enable) {
-            return;
-        }
+        $this->display = $display;
 
-        error_reporting(E_ALL);
+        $this->exceptionHandle = ExceptionHandler::registerHandle($this);
 
-        static::$logger = $logger;
-
-        static::$enable = true;
-
-        static::html();
-
-        if (!empty($config)) {
-            foreach ($config as $code => $value) {
-                static::$html[$code] = $value;
-            }
-        }
-
-        ExceptionHandler::registerHandle();
-
-        ErrorHandler::registerHandle();
+        $this->errorHandle = ErrorHandler::registerHandle($this);
     }
 
     /**
-     * @return void;
+     * @return ErrorHandler
      */
-    public static function html()
+    public function getErrorHandle()
     {
-        static::$html = [
-            Debug::HTTP_NOT_FOUND               => __DIR__ . '/Html/404.html',
-            Debug::HTTP_INTERNAL_SERVER_ERROR   => __DIR__ . '/Html/500.html',
-            Debug::HTTP_FOUND                   => __DIR__ . '/Html/302.html',
-        ];
+        return $this->errorHandle;
+    }
+
+    /**
+     * @return ExceptionHandler
+     */
+    public function getExceptionHandle()
+    {
+        return $this->exceptionHandle;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isDisplay()
+    {
+        return $this->display;
+    }
+
+    /**
+     * @param bool|true $display
+     * @return Debug
+     */
+    public static function enable($display = true)
+    {
+        if (static::$debug instanceof Debug) {
+            return static::$debug;
+        }
+
+        static::$debug = new static($display);
+
+        return static::$debug;
     }
 
     /**
@@ -101,7 +96,7 @@ class Debug extends HttpStatusCode
     /**
      * @param $vars
      */
-    public static function dump($vars)
+    public function dump($vars)
     {
         static::$debugBar = static::getDebugBar();
 
@@ -139,29 +134,15 @@ EOF;
         echo $renderFunc();
     }
 
-    /**
-     * @param ContextHandler $handler
-     * @return void
-     */
-    public static function output(ContextHandler $handler)
+    public function output(Wrapper $wrapper)
     {
-        if (null !== static::$logger) {
-            $context = [];
-            $context['Code'] = $handler->getCode();
-            $context['Line'] = $handler->getLine();
-            $context['File'] = $handler->getFile();
-            $context['_GET'] = $handler->getContext()['_GET'];
-            $context['_POST'] = $handler->getContext()['_POST'];
-            static::$logger->addError($handler->getMessage(), $context);
-        }
-
         if (!headers_sent()) {
-            header(sprintf('HTTP/1.1 %s', $handler->getStatusCode()));
-            foreach ($handler->getHeaders() as $name => $value) {
-                header($name . ': ' . $value, false);
-            }
+            header(sprintf('HTTP/1.1 %s', $wrapper->getStatusCode()));
+//            foreach ($handler->getHeaders() as $name => $value) {
+//                header($name . ': ' . $value, false);
+//            }
         }
 
-        echo $handler->getMessage();
+        echo $wrapper;
     }
 }

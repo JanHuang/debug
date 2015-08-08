@@ -14,17 +14,13 @@
 
 namespace FastD\Debug;
 
-use FastD\Debug\Exceptions\BaseException;
+use FastD\Debug\Exceptions\ServerInternalErrorException;
 
 class ErrorHandler
 {
     public function handle($code, $message, $file, $line)
     {
-        if (array_key_exists($code, Debug::$statusTexts)) {
-            $code = 500;
-        }
-
-        throw new BaseException($message, $code);
+        throw new ServerInternalErrorException($message, $file, $line);
     }
 
     public function handleFatalError(array $error = null)
