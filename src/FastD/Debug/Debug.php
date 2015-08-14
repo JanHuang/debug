@@ -161,6 +161,12 @@ class Debug
             return static::$debug;
         }
 
+        if ('cli' !== php_sapi_name()) {
+            ini_set('display_errors', 0);
+        } elseif (!ini_get('log_errors') || ini_get('error_log')) {
+            ini_set('display_errors', 1);
+        }
+
         static::$debug = new static($display, $logger);
 
         return static::$debug;

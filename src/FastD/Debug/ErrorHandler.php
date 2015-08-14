@@ -14,11 +14,18 @@
 
 namespace FastD\Debug;
 
-use FastD\Debug\Exceptions\HttpExceptionInterface;
+use FastD\Debug\Exceptions\FatalError;
 use FastD\Debug\Exceptions\ServerInternalErrorException;
 
 class ErrorHandler
 {
+    protected $debug;
+
+    public function __construct(Debug $debug = null)
+    {
+        $this->debug = $debug;
+    }
+
     public function handle($code, $message, $file, $line)
     {
         unset($code);
@@ -28,14 +35,20 @@ class ErrorHandler
         throw $serverInternalErrorException;
     }
 
-    public function handleFatalError(array $error = null)
+    public function handleFatalError()
     {
-
+        $error = error_get_last();
+        if($error){
+            $serverInternalErrorException = new FatalError($error['message']);
+            $serverInternalErrorException->setFile($error['message']);
+            $serverInternalErrorException->setLine($error['line']);
+            $this->debug->output(new Wrapper($serverInternalErrorException));
+        }
     }
 
-    public static function registerHandle()
+    public static function registerHandle(Debug $debug = null)
     {
-        $handle = new static();
+        $handle = new static($debug);
 
         set_error_handler([$handle, 'handle']);
 
