@@ -73,7 +73,7 @@ class Debug
     {
         $this->display = $display;
 
-        $this->logger = $logger;
+        $this->handleLogger($logger);
 
         $this->exceptionHandle = ExceptionHandler::registerHandle($this);
 
@@ -94,6 +94,16 @@ class Debug
     public function getExceptionHandle()
     {
         return $this->exceptionHandle;
+    }
+
+    /**
+     * @param Logger $logger
+     * @return $this
+     */
+    public function handleLogger(Logger $logger = null)
+    {
+        $this->logger = $logger;
+        return $this;
     }
 
     /**
