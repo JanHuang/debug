@@ -65,6 +65,16 @@ class Debug
      */
     protected $logger;
 
+    protected $cli = true;
+
+    /**
+     * @return boolean
+     */
+    public function isCli()
+    {
+        return $this->cli;
+    }
+
     /**
      * @param bool|true   $display
      * @param Logger|null $logger
@@ -171,13 +181,14 @@ class Debug
             return static::$debug;
         }
 
+        static::$debug = new static($display, $logger);
+
         if ('cli' !== php_sapi_name()) {
             ini_set('display_errors', 0);
+            static::$debug->cli = false;
         } elseif (!ini_get('log_errors') || ini_get('error_log')) {
             ini_set('display_errors', 1);
         }
-
-        static::$debug = new static($display, $logger);
 
         return static::$debug;
     }
@@ -232,14 +243,40 @@ EOF;
             return $html;
         };
 
-        echo $renderFunc();
+        return $renderFunc();
     }
 
     /**
      * @param Wrapper $wrapper
+     * @return int|void
      */
     public function output(Wrapper $wrapper)
     {
+        if ($this->isCli()) {
+
+            $path = $wrapper->getFile() . ': ' . $wrapper->getLine();
+            $length = strlen($path);
+
+            if ('WIN' === strtoupper(substr(PHP_OS, 0, 3))) {
+                echo PHP_EOL;
+                echo PHP_EOL;
+                echo '[' . $wrapper->getName() . ']' . PHP_EOL;
+                echo $wrapper->getMessage();
+                echo $path . PHP_EOL;
+                echo  PHP_EOL;
+                return 1;
+            }
+
+            echo PHP_EOL;
+            echo chr(27) . '[41m' . str_repeat(' ', $length + 6) . chr(27) . "[0m" . PHP_EOL;
+            echo chr(27) . '[41m   ' . '[' . $wrapper->getName() . ']   ' . str_repeat(' ', ($length - strlen($wrapper->getName()) - 2)) . chr(27) . "[0m" . PHP_EOL;
+            echo chr(27) . '[41m   ' . $wrapper->getMessage() . str_repeat(' ', $length - $wrapper->getMessage() - 4) . '   ' . chr(27) . "[0m" . PHP_EOL;
+            echo chr(27) . '[41m   ' . $path . '   ' . chr(27) . "[0m" . PHP_EOL;
+            echo chr(27) . '[41m' . str_repeat(' ', $length + 6) . chr(27) . "[0m" . PHP_EOL;
+            echo PHP_EOL;
+            return 1;
+        }
+
         if (!headers_sent()) {
             header(sprintf('HTTP/1.1 %s', $wrapper->getStatusCode()));
             foreach ($wrapper->getHeaders() as $name => $value) {

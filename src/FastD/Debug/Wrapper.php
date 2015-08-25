@@ -188,4 +188,9 @@ EOF;
     {
         return $this->style->getHtml();
     }
+
+    public function getName()
+    {
+        return get_class($this->exception);
+    }
 }
