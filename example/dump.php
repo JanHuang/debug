@@ -18,4 +18,4 @@ $debug = \FastD\Debug\Debug::enable();
 
 $debug->dump(['name' => 'janhuang']);
 
-$debug->showDebugBar();
+echo $debug->showDebugBar();

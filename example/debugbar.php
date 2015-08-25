@@ -16,4 +16,4 @@ include __DIR__ . '/../vendor/autoload.php';
 
 $debug = \FastD\Debug\Debug::enable();
 
-$debug->showDebugBar();
+echo $debug->showDebugBar();
