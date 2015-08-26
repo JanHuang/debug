@@ -248,12 +248,12 @@ EOF;
 
     /**
      * @param Wrapper $wrapper
+     * @param bool $isCli
      * @return int|void
      */
-    public function output(Wrapper $wrapper)
+    public function output(Wrapper $wrapper, $isCli = false)
     {
-        if ($this->isCli()) {
-
+        if ($this->isCli() || $isCli) {
             $path = $wrapper->getFile() . ': ' . $wrapper->getLine();
             $length = strlen($path);
 
@@ -287,16 +287,12 @@ EOF;
         if ($this->logger instanceof Logger && !$this->isDisplay()) {
             $this->logger->addError($wrapper->getMessage(), [
                 'FILE: ' => $wrapper->getFile(),
-                'LINE: ' => $wrapper->getFile(),
+                'LINE: ' => $wrapper->getLine(),
                 'GET: ' => $_GET,
                 'POST: ' => $_POST,
             ]);
         }
 
         echo $wrapper;
-
-        if ($this->isDisplay() && !$this->isShowDebugBar() && !$wrapper->isApplicationJson()) {
-            $this->showDebugBar();
-        }
     }
 }
