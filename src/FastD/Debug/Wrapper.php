@@ -13,6 +13,7 @@
  */
 
 namespace FastD\Debug;
+
 use FastD\Debug\Exceptions\HttpExceptionInterface;
 
 /**

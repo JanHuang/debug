@@ -14,8 +14,6 @@
 
 namespace FastD\Debug;
 
-use DebugBar\DebugBar;
-use DebugBar\StandardDebugBar;
 use Monolog\Logger;
 
 /**
@@ -44,11 +42,6 @@ class Debug
      * @var ErrorHandler
      */
     protected $errorHandle;
-
-    /**
-     * @var DebugBar
-     */
-    protected $debugBar;
 
     /**
      * @var bool
@@ -194,59 +187,6 @@ class Debug
     }
 
     /**
-     * @return DebugBar
-     */
-    public function getDebugBar()
-    {
-        if (null === $this->debugBar) {
-            $this->debugBar = new StandardDebugBar();
-        }
-
-        return $this->debugBar;
-    }
-
-    /**
-     * @param $vars
-     */
-    public function dump($vars)
-    {
-        $this->getDebugBar()['messages']->addMessage($vars);
-    }
-
-    /**
-     * @param array  $context
-     * @param string $resources
-     */
-    public function showDebugBar(array $context = [], $resources = 'http://resources.fast-d.cn/debugbar')
-    {
-        $this->showDebugBar = true;
-
-        $debagBar = $this->getDebugBar();
-
-        $debagBar['messages']->addMessage($context);
-
-        $render = $debagBar->getJavascriptRenderer()
-            ->setBaseUrl($resources)
-            ->setEnableJqueryNoConflict(true);
-
-        $renderFunc = function () use ($render) {
-            $html = <<<EOF
-<html>
-    <head>
-        {$render->renderHead()}
-    </head>
-    <body>
-    {$render->render()}
-    </body>
-</html>
-EOF;
-            return $html;
-        };
-
-        return $renderFunc();
-    }
-
-    /**
      * @param Wrapper $wrapper
      * @param bool $isCli
      * @return int|void
@@ -294,5 +234,7 @@ EOF;
         }
 
         echo $wrapper;
+
+        return;
     }
 }
