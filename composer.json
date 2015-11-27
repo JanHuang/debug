@@ -1,6 +1,6 @@
 {
     "name": "fastd/debug",
-    "description": "debug handle component.",
+    "description": "error handle component.",
     "keywords": ["exception", "FastD", "debug"],
     "type": "library",
     "license": "MIT",
@@ -13,10 +13,7 @@
     "minimum-stability": "dev",
     "require": {
         "php": ">=5.5",
-        "filp/whoops": "2.0.x-dev"
-    },
-    "require-dev": {
-        "fastd/logger": "dev-dev"
+        "fastd/logger": "2.0.x-dev"
     },
     "autoload": {
         "psr-4": {
