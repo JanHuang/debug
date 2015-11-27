@@ -12,20 +12,20 @@
     ],
     "minimum-stability": "dev",
     "require": {
-        "php": ">=5.4",
-        "maximebf/debugbar": ">=1.0.0"
+        "php": ">=5.5",
+        "filp/whoops": "2.0.x-dev"
     },
     "require-dev": {
         "fastd/logger": "dev-dev"
     },
-    "extra": {
-        "branch-alias": {
-            "dev-master": "1.0.x-dev"
-        }
-    },
     "autoload": {
         "psr-4": {
             "FastD\\": "src/FastD"
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.0.x-dev"
         }
     }
 }
