@@ -39,7 +39,7 @@ class ExceptionHandler
     /**
      * @param \Exception $exception
      */
-    public function handle(\Exception $exception)
+    public function handle($exception)
     {
         $wrapper = new Wrapper($exception);
         if (!$this->debug->isDisplay()) {

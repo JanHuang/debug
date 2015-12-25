@@ -88,7 +88,7 @@ class Wrapper
     /**
      * @param \Exception $exception
      */
-    public function __construct(\Exception $exception)
+    public function __construct($exception)
     {
         $this->exception = $exception;
         $this->style = new Style($this);
