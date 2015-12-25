@@ -37,11 +37,11 @@ class ExceptionHandler
     }
 
     /**
-     * @param \Exception $exception
+     * @param \Throwable $throwable
      */
-    public function handle(\Exception $exception)
+    public function handle(\Throwable $throwable)
     {
-        $wrapper = new Wrapper($exception);
+        $wrapper = new Wrapper($throwable);
         if (!$this->debug->isDisplay()) {
             $content = false !== ($content = $this->debug->getCustom($wrapper->getStatusCode())) ? $content : 'Whool!';
             $wrapper->custom($content);

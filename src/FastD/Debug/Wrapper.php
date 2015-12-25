@@ -87,11 +87,11 @@ class Wrapper
     }
 
     /**
-     * @param \Exception $exception
+     * @param \Throwable $throwable
      */
-    public function __construct(\Exception $exception)
+    public function __construct(\Throwable $throwable)
     {
-        $this->exception = $exception;
+        $this->exception = $throwable;
         $this->style = new Style($this);
     }
 

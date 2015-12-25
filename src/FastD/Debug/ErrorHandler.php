@@ -17,15 +17,35 @@ namespace FastD\Debug;
 use FastD\Debug\Exceptions\FatalError;
 use FastD\Debug\Exceptions\ServerInternalErrorException;
 
+/**
+ * Class ErrorHandler
+ *
+ * @package FastD\Debug
+ */
 class ErrorHandler
 {
+    /**
+     * @var Debug
+     */
     protected $debug;
 
+    /**
+     * ErrorHandler constructor.
+     *
+     * @param Debug|null $debug
+     */
     public function __construct(Debug $debug = null)
     {
         $this->debug = $debug;
     }
 
+    /**
+     * @param $code
+     * @param $message
+     * @param $file
+     * @param $line
+     * @throws ServerInternalErrorException
+     */
     public function handle($code, $message, $file, $line)
     {
         unset($code);
@@ -35,6 +55,9 @@ class ErrorHandler
         throw $serverInternalErrorException;
     }
 
+    /**
+     * @return void
+     */
     public function handleFatalError()
     {
         $error = error_get_last();
@@ -46,6 +69,10 @@ class ErrorHandler
         }
     }
 
+    /**
+     * @param Debug|null $debug
+     * @return static
+     */
     public static function registerHandle(Debug $debug = null)
     {
         $handle = new static($debug);

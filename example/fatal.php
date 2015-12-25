@@ -15,5 +15,8 @@
 include __DIR__ . '/../vendor/autoload.php';
 
 $debug = \FastD\Debug\Debug::enable();
-
-echo abc();
+try {
+    echo abc();
+} catch (Exception $e) {
+    echo $e->getMessage();
+}
