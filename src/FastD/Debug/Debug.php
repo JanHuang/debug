@@ -44,11 +44,6 @@ class Debug
     protected $errorHandle;
 
     /**
-     * @var bool
-     */
-    protected $showDebugBar = false;
-
-    /**
      * @var array
      */
     protected $errorPage = [];
@@ -115,14 +110,6 @@ class Debug
     public function isDisplay()
     {
         return $this->display;
-    }
-
-    /**
-     * @return boolean
-     */
-    public function isShowDebugBar()
-    {
-        return $this->showDebugBar;
     }
 
     /**

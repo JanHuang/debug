@@ -18,4 +18,4 @@ $debug = \FastD\Debug\Debug::enable(false);
 
 $debug->setCustom(500, __DIR__ . '/demo.html');
 
-throw new \FastD\Debug\Exceptions\ServerInternalErrorException('eror');
+throw new \FastD\Debug\Exceptions\ServerInternalErrorException('error');

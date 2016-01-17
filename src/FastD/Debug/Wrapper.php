@@ -175,7 +175,7 @@ EOF;
      * @param $html
      * @return $this
      */
-    public function custom($html)
+    public function setHtml($html)
     {
         $this->style->setHtml($html);
 

@@ -43,8 +43,8 @@ class ExceptionHandler
     {
         $wrapper = new Wrapper($throwable);
         if (!$this->debug->isDisplay()) {
-            $content = false !== ($content = $this->debug->getCustom($wrapper->getStatusCode())) ? $content : 'Whool!';
-            $wrapper->custom($content);
+            $content = false !== ($content = $this->debug->getErrorPage($wrapper->getStatusCode())) ? $content : 'Whool!';
+            $wrapper->setHtml($content);
         }
         $this->debug->output($wrapper);
     }

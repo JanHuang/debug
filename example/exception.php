@@ -16,6 +16,6 @@
 include __DIR__ . '/../vendor/autoload.php';
 
 
-$debug = \FastD\Debug\Debug::enable();
+$debug = \FastD\Debug\Debug::enable(false);
 
 throw new \FastD\Debug\Exceptions\ServerInternalErrorException('500 server error.');
