@@ -51,7 +51,7 @@ class Debug
     /**
      * @var array
      */
-    protected $custom = [];
+    protected $errorPage = [];
 
     /**
      * @var Logger
@@ -130,9 +130,9 @@ class Debug
      * @param $content
      * @return $this
      */
-    public function setCustom($code, $content)
+    public function setErrorPage($code, $content)
     {
-        $this->custom[$code] = $content;
+        $this->errorPage[$code] = $content;
 
         return $this;
     }
@@ -141,26 +141,26 @@ class Debug
      * @param $code
      * @return bool|string
      */
-    public function getCustom($code)
+    public function getErrorPage($code)
     {
-        if (!$this->hasCustom($code)) {
+        if (!$this->hasErrorPage($code)) {
             return false;
         }
 
-        if (file_exists($this->custom[$code])) {
-            return file_get_contents($this->custom[$code]);
+        if (file_exists($this->errorPage[$code])) {
+            return file_get_contents($this->errorPage[$code]);
         }
 
-        return $this->custom[$code];
+        return $this->errorPage[$code];
     }
 
     /**
      * @param $code
      * @return bool
      */
-    public function hasCustom($code)
+    public function hasErrorPage($code)
     {
-        return isset($this->custom[$code]) ? $this->custom[$code] : false;
+        return isset($this->errorPage[$code]) ? $this->errorPage[$code] : false;
     }
 
     /**
@@ -204,7 +204,7 @@ class Debug
                 echo $wrapper->getMessage();
                 echo $path . PHP_EOL;
                 echo  PHP_EOL;
-                return 1;
+                return 0;
             }
 
             echo PHP_EOL;
@@ -214,7 +214,7 @@ class Debug
             echo chr(27) . '[41m   ' . $path . '   ' . chr(27) . "[0m" . PHP_EOL;
             echo chr(27) . '[41m' . str_repeat(' ', $length + 6) . chr(27) . "[0m" . PHP_EOL;
             echo PHP_EOL;
-            return 1;
+            return 0;
         }
 
         if (!headers_sent()) {
@@ -235,6 +235,6 @@ class Debug
 
         echo $wrapper;
 
-        return;
+        return 0;
     }
 }
