@@ -2,8 +2,8 @@
 /**
  * Created by PhpStorm.
  * User: janhuang
- * Date: 15/6/24
- * Time: 上午11:54
+ * Date: 16/4/21
+ * Time: 下午9:36
  * Github: https://www.github.com/janhuang
  * Coding: https://www.coding.net/janhuang
  * SegmentFault: http://segmentfault.com/u/janhuang
@@ -15,41 +15,49 @@
 namespace FastD\Debug;
 
 use FastD\Debug\Exceptions\FatalError;
-use FastD\Debug\Exceptions\ServerInternalErrorException;
+use FastD\Debug\Style\Wrapper;
 
 /**
- * Class ErrorHandler
+ * Class Handler
  *
  * @package FastD\Debug
  */
-class ErrorHandler
+class Handler
 {
     /**
      * @var Debug
      */
     protected $debug;
 
+
     /**
-     * ErrorHandler constructor.
-     *
-     * @param Debug|null $debug
+     * Handler constructor.
+     * @param Debug $debug
      */
-    public function __construct(Debug $debug = null)
+    private function __construct(Debug $debug)
     {
         $this->debug = $debug;
+
+        set_exception_handler([$this, 'exceptionHandle']);
+
+        set_error_handler([$this, 'errorHandle']);
+
+        register_shutdown_function([$this, 'fatalErrorHandler']);
     }
+
+    final private function __clone(){}
 
     /**
      * @param $code
      * @param $message
      * @param $file
      * @param $line
-     * @throws ServerInternalErrorException
+     * @throws FatalError
      */
-    public function handle($code, $message, $file, $line)
+    public function errorHandle($code, $message, $file, $line)
     {
         unset($code);
-        $serverInternalErrorException = new ServerInternalErrorException($message);
+        $serverInternalErrorException = new FatalError($message);
         $serverInternalErrorException->setFile($file);
         $serverInternalErrorException->setLine($line);
         throw $serverInternalErrorException;
@@ -58,10 +66,11 @@ class ErrorHandler
     /**
      * @return void
      */
-    public function handleFatalError()
+    public function fatalErrorHandler()
     {
         $error = error_get_last();
-        if($error){
+
+        if ($error) {
             $serverInternalErrorException = new FatalError($error['message']);
             $serverInternalErrorException->setFile($error['message']);
             $serverInternalErrorException->setLine($error['line']);
@@ -70,17 +79,19 @@ class ErrorHandler
     }
 
     /**
-     * @param Debug|null $debug
+     * @param \Throwable $throwable
+     */
+    public function exceptionHandle(\Throwable $throwable)
+    {
+        $this->debug->output(new Wrapper($throwable));
+    }
+
+    /**
+     * @param Debug $debug
      * @return static
      */
-    public static function registerHandle(Debug $debug = null)
+    public static function register(Debug $debug)
     {
-        $handle = new static($debug);
-
-        set_error_handler([$handle, 'handle']);
-
-        register_shutdown_function([$handle, 'handleFatalError']);
-
-        return $handle;
+        return new static($debug);
     }
 }

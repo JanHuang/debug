@@ -2,8 +2,8 @@
 /**
  * Created by PhpStorm.
  * User: janhuang
- * Date: 15/11/27
- * Time: 下午2:29
+ * Date: 16/4/21
+ * Time: 下午9:26
  * Github: https://www.github.com/janhuang
  * Coding: https://www.coding.net/janhuang
  * SegmentFault: http://segmentfault.com/u/janhuang
@@ -12,6 +12,16 @@
  * WebSite: http://www.janhuang.me
  */
 
-include __DIR__ . '/../vendor/autoload.php';
+namespace FastD\Debug\Tests;
 
+use FastD\Debug\Handler\ErrorHandler;
 
+class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
+{
+    public function testError()
+    {
+        ErrorHandler::register();
+
+        v();
+    }
+}

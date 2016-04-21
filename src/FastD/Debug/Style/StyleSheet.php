@@ -12,14 +12,14 @@
  * WebSite: http://www.janhuang.me
  */
 
-namespace FastD\Debug;
+namespace FastD\Debug\Style;
 
 /**
  * Class Style
  *
  * @package FastD\Debug
  */
-class Style
+class StyleSheet
 {
     /**
      * @var Wrapper
@@ -48,10 +48,6 @@ class Style
     {
         if (!empty($this->html)) {
             return $this->html;
-        }
-
-        if ($this->wrapper->isApplicationJson()) {
-            return $this->wrapper->getMessage();
         }
 
         $title = $this->wrapper->getTitle();

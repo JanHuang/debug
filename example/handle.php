@@ -2,8 +2,8 @@
 /**
  * Created by PhpStorm.
  * User: janhuang
- * Date: 15/8/8
- * Time: 下午12:03
+ * Date: 16/4/21
+ * Time: 下午9:45
  * Github: https://www.github.com/janhuang
  * Coding: https://www.coding.net/janhuang
  * SegmentFault: http://segmentfault.com/u/janhuang
@@ -14,8 +14,6 @@
 
 include __DIR__ . '/../vendor/autoload.php';
 
-$debug = \FastD\Debug\Debug::enable();
+\FastD\Debug\Handler::register(new \FastD\Debug\Debug());
 
-$debug->dump(['name' => 'janhuang']);
-
-echo $debug->showDebugBar();
+v();

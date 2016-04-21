@@ -15,6 +15,7 @@
 namespace FastD\Debug;
 
 use Monolog\Logger;
+use FastD\Debug\Style\Wrapper;
 
 /**
  * Class Debug
@@ -34,16 +35,6 @@ class Debug
     protected $display = true;
 
     /**
-     * @var ExceptionHandler
-     */
-    protected $exceptionHandle;
-
-    /**
-     * @var ErrorHandler
-     */
-    protected $errorHandle;
-
-    /**
      * @var array
      */
     protected $errorPage = [];
@@ -53,7 +44,28 @@ class Debug
      */
     protected $logger;
 
+    /**
+     * @var bool
+     */
     protected $cli = true;
+
+    /**
+     * @param bool|true   $display
+     * @param Logger|null $logger
+     */
+    public function __construct($display = true, Logger $logger = null)
+    {
+        $this->display = $display;
+
+        $this->setLogger($logger);
+
+        if ('cli' !== php_sapi_name()) {
+            ini_set('display_errors', 0);
+            $this->cli = false;
+        } elseif (!ini_get('log_errors') || ini_get('error_log')) {
+            ini_set('display_errors', 1);
+        }
+    }
 
     /**
      * @return boolean
@@ -64,44 +76,22 @@ class Debug
     }
 
     /**
-     * @param bool|true   $display
-     * @param Logger|null $logger
-     */
-    public function __construct($display = true, Logger $logger = null)
-    {
-        $this->display = $display;
-
-        $this->handleLogger($logger);
-
-        $this->exceptionHandle = ExceptionHandler::registerHandle($this);
-
-        $this->errorHandle = ErrorHandler::registerHandle($this);
-    }
-
-    /**
-     * @return ErrorHandler
-     */
-    public function getErrorHandle()
-    {
-        return $this->errorHandle;
-    }
-
-    /**
-     * @return ExceptionHandler
-     */
-    public function getExceptionHandle()
-    {
-        return $this->exceptionHandle;
-    }
-
-    /**
      * @param Logger $logger
      * @return $this
      */
-    public function handleLogger(Logger $logger = null)
+    public function setLogger(Logger $logger = null)
     {
         $this->logger = $logger;
+
         return $this;
+    }
+
+    /**
+     * @return Logger
+     */
+    public function getLogger()
+    {
+        return $this->logger;
     }
 
     /**
@@ -157,17 +147,9 @@ class Debug
      */
     public static function enable($display = true, Logger $logger = null)
     {
-        if (static::$debug instanceof Debug) {
-            return static::$debug;
-        }
-
-        static::$debug = new static($display, $logger);
-
-        if ('cli' !== php_sapi_name()) {
-            ini_set('display_errors', 0);
-            static::$debug->cli = false;
-        } elseif (!ini_get('log_errors') || ini_get('error_log')) {
-            ini_set('display_errors', 1);
+        if (null === static::$debug) {
+            static::$debug = new static($display, $logger);
+            Handler::register(static::$debug);
         }
 
         return static::$debug;
@@ -175,53 +157,18 @@ class Debug
 
     /**
      * @param Wrapper $wrapper
-     * @param bool $isCli
      * @return int|void
      */
-    public function output(Wrapper $wrapper, $isCli = false)
+    public function output(Wrapper $wrapper)
     {
-        if ($this->isCli() || $isCli) {
-            $path = $wrapper->getFile() . ': ' . $wrapper->getLine();
-            $length = strlen($path);
-
-            if ('WIN' === strtoupper(substr(PHP_OS, 0, 3))) {
-                echo PHP_EOL;
-                echo PHP_EOL;
-                echo '[' . $wrapper->getName() . ']' . PHP_EOL;
-                echo $wrapper->getMessage();
-                echo $path . PHP_EOL;
-                echo  PHP_EOL;
-                return 0;
-            }
-
-            echo PHP_EOL;
-            echo chr(27) . '[41m' . str_repeat(' ', $length + 6) . chr(27) . "[0m" . PHP_EOL;
-            echo chr(27) . '[41m   ' . '[' . $wrapper->getName() . ']   ' . str_repeat(' ', ($length - strlen($wrapper->getName()) - 2)) . chr(27) . "[0m" . PHP_EOL;
-            echo chr(27) . '[41m   ' . $wrapper->getMessage() . str_repeat(' ', $length - $wrapper->getMessage() - 4) . '   ' . chr(27) . "[0m" . PHP_EOL;
-            echo chr(27) . '[41m   ' . $path . '   ' . chr(27) . "[0m" . PHP_EOL;
-            echo chr(27) . '[41m' . str_repeat(' ', $length + 6) . chr(27) . "[0m" . PHP_EOL;
-            echo PHP_EOL;
-            return 0;
-        }
-
-        if (!headers_sent()) {
-            header(sprintf('HTTP/1.1 %s', $wrapper->getStatusCode()));
-            foreach ($wrapper->getHeaders() as $name => $value) {
-                header($name . ': ' . $value, false);
-            }
-        }
-
-        if ($this->logger instanceof Logger && !$this->isDisplay()) {
-            $this->logger->addError($wrapper->getMessage(), [
-                'FILE: ' => $wrapper->getFile(),
-                'LINE: ' => $wrapper->getLine(),
-                'GET: ' => $_GET,
-                'POST: ' => $_POST,
+        if (!$this->isDisplay()) {
+            $this->logger->error($wrapper->getTitle(), [
+                'status' => $wrapper->getStatusCode(),
+                'get' => $_GET,
+                'post' => $_POST
             ]);
         }
 
-        echo $wrapper;
-
-        return 0;
+        return $wrapper->send($this->isCli());
     }
 }

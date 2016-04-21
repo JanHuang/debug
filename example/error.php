@@ -14,7 +14,9 @@
 
 include __DIR__ . '/../vendor/autoload.php';
 
-\FastD\Debug\Debug::enable();
+use FastD\Debug\Debug;
+
+Debug::enable();
 
 trigger_error('demo');
  

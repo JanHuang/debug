@@ -2,8 +2,8 @@
 /**
  * Created by PhpStorm.
  * User: janhuang
- * Date: 15/6/28
- * Time: 下午5:17
+ * Date: 16/4/21
+ * Time: 下午7:18
  * Github: https://www.github.com/janhuang
  * Coding: https://www.coding.net/janhuang
  * SegmentFault: http://segmentfault.com/u/janhuang
@@ -12,9 +12,12 @@
  * WebSite: http://www.janhuang.me
  */
 
+namespace FastD\Debug\Tests;
 
-include __DIR__ . '/../vendor/autoload.php';
+class DebugTest extends \PHPUnit_Framework_TestCase
+{
+    public function testError()
+    {
 
-$debug = \FastD\Debug\Debug::enable(false);
-
-throw new \FastD\Debug\Exceptions\Http\ServerInternalErrorException('500');
+    }
+}

@@ -12,7 +12,7 @@
  * WebSite: http://www.janhuang.me
  */
 
-namespace FastD\Debug\Exceptions;
+namespace FastD\Debug\Exceptions\Http;
 
 class ForbiddenHttpException extends HttpException
 {

@@ -2,8 +2,8 @@
 /**
  * Created by PhpStorm.
  * User: janhuang
- * Date: 15/8/8
- * Time: 下午12:21
+ * Date: 16/4/21
+ * Time: 下午10:17
  * Github: https://www.github.com/janhuang
  * Coding: https://www.coding.net/janhuang
  * SegmentFault: http://segmentfault.com/u/janhuang
@@ -12,10 +12,17 @@
  * WebSite: http://www.janhuang.me
  */
 
-include __DIR__ . '/../vendor/autoload.php';
+namespace FastD\Debug\Exceptions;
 
-$debug = \FastD\Debug\Debug::enable(false);
+class Exception extends \ErrorException
+{
+    public function setFile($file)
+    {
+        $this->file = $file;
+    }
 
-$debug->setCustom(500, __DIR__ . '/demo.html');
-
-throw new \FastD\Debug\Exceptions\ServerInternalErrorException('error');
+    public function setLine($line)
+    {
+        $this->line = $line;
+    }
+}

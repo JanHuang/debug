@@ -14,7 +14,7 @@
 
 namespace FastD\Debug\Exceptions;
 
-class FatalError extends ServerInternalErrorException
+class FatalError extends Exception
 {
 
 }

@@ -15,9 +15,12 @@
 
 include __DIR__ . '/../vendor/autoload.php';
 
-$logger = new \FastD\Logger\Logger();
+$logger = new \Monolog\Logger('test');
+$stream = new \Monolog\Handler\StreamHandler(__DIR__ . '/test.log');
+$stream->setFormatter(new Monolog\Formatter\LineFormatter("[%datetime%] >> %level_name%: >> %message% >> %context% >> %extra%\n"));
+$logger->pushHandler($stream);
 
-$debug = \FastD\Debug\Debug::enable(false, $logger->createLogger(__DIR__ . '/demo.log'));
+$debug = \FastD\Debug\Debug::enable(false, $logger);
 
-trigger_error('demo error');
+throw new \FastD\Debug\Exceptions\Http\NotFoundHttpException(404);
 

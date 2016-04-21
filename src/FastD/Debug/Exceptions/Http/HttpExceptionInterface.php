@@ -12,13 +12,14 @@
  * WebSite: http://www.janhuang.me
  */
 
-namespace FastD\Debug\Exceptions;
+namespace FastD\Debug\Exceptions\Http;
 
 interface HttpExceptionInterface
 {
     const HTTP_SERVER_INTERNAL_ERROR = 500;
     const HTTP_FORBIDDEN = 403;
     const HTTP_NOT_FOUND = 404;
+    const HTTP_BAD_REQUEST = 400;
 
     /**
      * Returns the status code.

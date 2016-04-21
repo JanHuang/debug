@@ -12,14 +12,16 @@
  * WebSite: http://www.janhuang.me
  */
 
-namespace FastD\Debug\Exceptions;
+namespace FastD\Debug\Exceptions\Http;
+
+use FastD\Debug\Exceptions\Exception;
 
 /**
  * Class HttpException
  *
  * @package FastD\Debug\Exceptions
  */
-class HttpException extends \ErrorException implements HttpExceptionInterface
+class HttpException extends Exception implements HttpExceptionInterface
 {
     protected $statusCode;
 
@@ -58,15 +60,5 @@ class HttpException extends \ErrorException implements HttpExceptionInterface
     public function getHeaders()
     {
         return $this->headers;
-    }
-
-    public function setFile($file)
-    {
-        $this->file = $file;
-    }
-
-    public function setLine($line)
-    {
-        $this->line = $line;
     }
 }

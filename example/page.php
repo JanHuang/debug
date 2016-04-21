@@ -2,8 +2,8 @@
 /**
  * Created by PhpStorm.
  * User: janhuang
- * Date: 15/6/28
- * Time: 下午8:00
+ * Date: 16/4/21
+ * Time: 下午11:10
  * Github: https://www.github.com/janhuang
  * Coding: https://www.coding.net/janhuang
  * SegmentFault: http://segmentfault.com/u/janhuang
@@ -14,6 +14,6 @@
 
 include __DIR__ . '/../vendor/autoload.php';
 
-$debug = \FastD\Debug\Debug::enable();
+$debug = \FastD\Debug\Debug::enable(false);
 
-echo $debug->showDebugBar();
+throw new \FastD\Debug\Exceptions\Http\ServerInternalErrorException('500');
