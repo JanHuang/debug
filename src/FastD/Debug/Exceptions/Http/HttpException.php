@@ -23,10 +23,16 @@ use FastD\Debug\Exceptions\Exception;
  */
 class HttpException extends Exception implements HttpExceptionInterface
 {
+    /**
+     * @var int
+     */
     protected $statusCode;
 
+    /**
+     * @var array
+     */
     protected $headers = [
-        'Content-Type' => 'text/html; charset=utf-8'
+        'Content-Type' => 'text/html; charset=utf-8;'
     ];
 
     /**
@@ -38,7 +44,6 @@ class HttpException extends Exception implements HttpExceptionInterface
     {
         $this->statusCode = $code;
         $this->headers = array_merge($this->headers, $headers);
-        $message = is_array($message) ? json_encode($message, JSON_UNESCAPED_UNICODE) : $message;
         parent::__construct($message, $code, 1);
     }
 

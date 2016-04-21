@@ -44,13 +44,19 @@ class Wrapper
     }
 
     /**
+     * @return string
+     */
+    public function getMessage()
+    {
+        return $this->exception->getMessage();
+    }
+
+    /**
      * @return array
      */
     public function getHeaders()
     {
-        return [
-            'Content-Type' => 'text/html; charset=utf-8;',
-        ];
+        return $this->exception->getHeaders();
     }
 
     /**

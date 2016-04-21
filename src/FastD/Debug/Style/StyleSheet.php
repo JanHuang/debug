@@ -26,8 +26,6 @@ class StyleSheet
      */
     private $wrapper;
 
-    protected $html;
-
     /**
      * @param Wrapper $wrapper
      */
@@ -36,23 +34,20 @@ class StyleSheet
         $this->wrapper = $wrapper;
     }
 
-    public function setHtml($html)
-    {
-        $this->html = $html;
-    }
-
     /**
      * @return string
      */
     public function getHtml()
     {
-        if (!empty($this->html)) {
-            return $this->html;
-        }
-
         $title = $this->wrapper->getTitle();
         $style = $this->getStyleSheet();
         $content = $this->wrapper->getContent();
+
+        if (isset($this->wrapper->getHeaders()['Content-Type'])) {
+            if (false !== strpos($this->wrapper->getHeaders()['Content-Type'], 'application/json')) {
+                return $this->wrapper->getMessage();
+            }
+        }
         return <<<EOF
 <!DOCTYPE html>
 <html>

@@ -41,7 +41,7 @@ class JsonException extends Exception
     public function getHeaders()
     {
         return [
-            'Content-Type' => 'text/html; charset=utf-8'
+            'Content-Type' => 'application/json; charset=utf-8'
         ];
     }
 }
