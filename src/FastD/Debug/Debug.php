@@ -161,7 +161,7 @@ class Debug
      */
     public function output(Wrapper $wrapper)
     {
-        if (!$this->isDisplay()) {
+        if (!$this->isDisplay() && null !== $this->logger) {
             $this->logger->error($wrapper->getTitle(), [
                 'status' => $wrapper->getStatusCode(),
                 'get' => $_GET,

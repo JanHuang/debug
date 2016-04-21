@@ -14,13 +14,16 @@
 
 namespace FastD\Debug\Tests;
 
-use FastD\Debug\Handler\ErrorHandler;
+use FastD\Debug\Debug;
 
 class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @expectedException \Error
+     */
     public function testError()
     {
-        ErrorHandler::register();
+        Debug::enable();
 
         v();
     }

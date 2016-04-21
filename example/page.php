@@ -16,4 +16,17 @@ include __DIR__ . '/../vendor/autoload.php';
 
 $debug = \FastD\Debug\Debug::enable();
 
-throw new \FastD\Debug\Exceptions\Http\ServerInternalErrorException('500');
+class PageException extends \FastD\Debug\Exceptions\Http\HttpException
+{
+    /**
+     * Returns response content.
+     *
+     * @return string
+     */
+    public function getContent()
+    {
+        return file_get_contents(__DIR__ . '/demo.html');
+    }
+}
+
+throw new PageException('custom');

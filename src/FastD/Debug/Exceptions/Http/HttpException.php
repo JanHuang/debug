@@ -66,4 +66,14 @@ class HttpException extends Exception implements HttpExceptionInterface
     {
         return $this->headers;
     }
+
+    /**
+     * Returns response content.
+     *
+     * @return string
+     */
+    public function getContent()
+    {
+        return '';
+    }
 }

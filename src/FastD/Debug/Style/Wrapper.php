@@ -14,6 +14,7 @@
 
 namespace FastD\Debug\Style;
 
+use FastD\Debug\Exceptions\Exception;
 use FastD\Debug\Exceptions\Http\HttpExceptionInterface;
 
 /**
@@ -148,7 +149,11 @@ EOF;
             }
         }
 
-        echo $this->style->getHtml();
+        if ('' !== ($content = $this->exception->getContent())) {
+            echo $content;
+        } else {
+            echo $this->style->getHtml();
+        }
 
         return 0;
     }

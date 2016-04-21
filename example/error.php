@@ -19,4 +19,3 @@ use FastD\Debug\Debug;
 Debug::enable();
 
 trigger_error('demo');
- 

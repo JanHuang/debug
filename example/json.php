@@ -16,7 +16,7 @@ include __DIR__ . '/../vendor/autoload.php';
 
 $debug = \FastD\Debug\Debug::enable();
 
-class JsonException extends Exception
+class JsonException extends \FastD\Debug\Exceptions\Exception
 {
     public function __construct(array $data, $code = 500, Exception $previous = null)
     {

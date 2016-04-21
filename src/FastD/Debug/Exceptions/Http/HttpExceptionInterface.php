@@ -14,6 +14,11 @@
 
 namespace FastD\Debug\Exceptions\Http;
 
+/**
+ * Interface HttpExceptionInterface
+ *
+ * @package FastD\Debug\Exceptions\Http
+ */
 interface HttpExceptionInterface
 {
     const HTTP_SERVER_INTERNAL_ERROR = 500;
@@ -34,4 +39,11 @@ interface HttpExceptionInterface
      * @return array Response headers
      */
     public function getHeaders();
+
+    /**
+     * Returns response content.
+     *
+     * @return string
+     */
+    public function getContent();
 }
