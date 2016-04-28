@@ -45,11 +45,6 @@ class Debug
     protected $logger;
 
     /**
-     * @var bool
-     */
-    protected $cli = true;
-
-    /**
      * @param bool|true   $display
      * @param Logger|null $logger
      */
@@ -61,18 +56,10 @@ class Debug
 
         if ('cli' !== php_sapi_name()) {
             ini_set('display_errors', 0);
-            $this->cli = false;
+
         } elseif (!ini_get('log_errors') || ini_get('error_log')) {
             ini_set('display_errors', 1);
         }
-    }
-
-    /**
-     * @return boolean
-     */
-    public function isCli()
-    {
-        return $this->cli;
     }
 
     /**
@@ -162,13 +149,13 @@ class Debug
     public function output(Wrapper $wrapper)
     {
         if (!$this->isDisplay() && null !== $this->logger) {
-            $this->logger->error($wrapper->getTitle(), [
-                'status' => $wrapper->getStatusCode(),
+            $this->logger->error($wrapper->getStyleSheet()->getTitle(), [
+                'status' => $wrapper->getStyleSheet()->getStatusCode(),
                 'get' => $_GET,
                 'post' => $_POST
             ]);
         }
 
-        return $wrapper->send($this->isCli());
+        return $wrapper->send();
     }
 }

@@ -14,24 +14,144 @@
 
 namespace FastD\Debug\Style;
 
+use FastD\Debug\Exceptions\Http\HttpException;
+
 /**
- * Class Style
+ * Class StyleSheet
  *
- * @package FastD\Debug
+ * @package FastD\Debug\Style
  */
 class StyleSheet
 {
     /**
-     * @var Wrapper
+     * @var \Throwable
      */
-    private $wrapper;
+    private $throwable;
 
     /**
-     * @param Wrapper $wrapper
+     * @var bool
      */
-    public function __construct(Wrapper $wrapper)
+    protected $cli = false;
+
+    /**
+     * StyleSheet constructor.
+     * @param \Throwable $throwable
+     */
+    public function __construct(\Throwable $throwable)
     {
-        $this->wrapper = $wrapper;
+        $this->throwable = $throwable;
+
+        if ('cli' === php_sapi_name()) {
+            $this->cli = true;
+        }
+    }
+
+    /**
+     * @return bool
+     */
+    public function isCli()
+    {
+        return $this->cli;
+    }
+
+    /**
+     * @return string
+     */
+    public function getMessage()
+    {
+        return $this->throwable->getMessage();
+    }
+
+    /**
+     * @return array
+     */
+    public function getHeaders()
+    {
+        if ($this->throwable instanceof HttpException) {
+            return $this->throwable->getHeaders();
+        }
+
+        return [
+            'Content-Type' => 'text/html; charset=utf-8;'
+        ];
+    }
+
+    /**
+     * @return int|mixed
+     */
+    public function getStatusCode()
+    {
+        return $this->throwable->getCode();
+    }
+
+    /**
+     * @return string
+     */
+    public function getTitle()
+    {
+        switch ($this->getStatusCode()) {
+            case 404:
+                $title = 'Sorry, the page you are looking for could not be found.';
+                break;
+            default:
+                $title = 'Whoops, looks like something went wrong.';
+        }
+
+        return $title;
+    }
+
+    /**
+     * @return string
+     */
+    public function getContent()
+    {
+        if ($this->isCli()) {
+            return $this->getCliContent();
+        }
+
+        if (method_exists($this->throwable, 'getContent') && '' !== ($content = $this->throwable->getContent())) {
+            return $content;
+        }
+
+        return $this->getHtml();
+    }
+
+    /**
+     * @return string
+     */
+    public function getName()
+    {
+        return get_class($this->throwable);
+    }
+
+    /**
+     * @return string
+     */
+    public function getCliContent()
+    {
+        $content = '';
+
+        $path = $this->throwable->getFile() . ': ' . $this->throwable->getLine();
+        $length = strlen($path);
+
+        if ('WIN' === strtoupper(substr(PHP_OS, 0, 3))) {
+            $content .= PHP_EOL . PHP_EOL;
+            $content .= '[' . $this->getName() . ']' . PHP_EOL;
+            $content .= $this->throwable->getMessage();
+            $content .= $path . PHP_EOL;
+            $content .= PHP_EOL;
+            return $content;
+        }
+
+        $content .= PHP_EOL;
+        $content .= chr(27) . '[41m' . str_repeat(' ', $length + 6) . chr(27) . "[0m" . PHP_EOL;
+        $content .= chr(27) . '[41m   ' . '[' . $this->getName() . ']   ' . str_repeat(' ', ($length - strlen($this->getName()) - 2)) . chr(27) . "[0m" . PHP_EOL;
+        $content .= chr(27) . '[41m   ' . $this->throwable->getMessage() . str_repeat(' ', $length - strlen($this->throwable->getMessage())) . '   ' . chr(27) . "[0m" . PHP_EOL;
+        $content .= chr(27) . '[41m   ' . $path . '   ' . chr(27) . "[0m" . PHP_EOL;
+        $content .= chr(27) . '[41m' . str_repeat(' ', $length + 6) . chr(27) . "[0m" . PHP_EOL;
+        $content .= PHP_EOL;
+
+        return $content;
     }
 
     /**
@@ -39,13 +159,25 @@ class StyleSheet
      */
     public function getHtml()
     {
-        $title = $this->wrapper->getTitle();
+        $title = $this->getTitle();
         $style = $this->getStyleSheet();
-        $content = $this->wrapper->getContent();
+        $filename = pathinfo($this->throwable->getFile(), PATHINFO_BASENAME);
+        $name = $this->getName();
 
-        if (isset($this->wrapper->getHeaders()['Content-Type'])) {
-            if (false !== strpos($this->wrapper->getHeaders()['Content-Type'], 'application/json')) {
-                return $this->wrapper->getMessage();
+        $trace = ltrim(str_replace('#', '<br />#', $this->throwable->getTraceAsString()), '<br />');
+
+        $content = <<<EOF
+<h2 class="block_exception clear_fix">
+    <span class="exception_counter">1/1</span>
+    <span class="exception_title"><abbr title="{$name}">{$name}</abbr> in <a title="{$this->throwable->getFile()} line {$this->throwable->getLine()}" ondblclick="var f=this.innerHTML;this.innerHTML=this.title;this.title=f;">{$filename} line {$this->throwable->getLine()}</a>:</span>
+    <span class="exception_message">{$this->throwable->getMessage()}</span>
+</h2>
+<div class="block">{$trace}</div>
+EOF;
+
+        if (isset($this->getHeaders()['Content-Type'])) {
+            if (false !== strpos($this->getHeaders()['Content-Type'], 'application/json')) {
+                return $this->getMessage();
             }
         }
         return <<<EOF
