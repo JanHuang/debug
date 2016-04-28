@@ -31,16 +31,17 @@ class Wrapper
     /**
      * @var StyleSheet
      */
-    private $style;
+    protected $style;
 
     /**
      * @param \Throwable $throwable
+     * @param bool $display
      */
-    public function __construct(\Throwable $throwable)
+    public function __construct(\Throwable $throwable, $display = true)
     {
         $this->exception = $throwable;
 
-        $this->style = new StyleSheet($throwable);
+        $this->style = new StyleSheet($throwable, $display);
     }
 
     /**

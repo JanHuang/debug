@@ -26,7 +26,7 @@ class StyleSheet
     /**
      * @var \Throwable
      */
-    private $throwable;
+    protected $throwable;
 
     /**
      * @var bool
@@ -34,16 +34,24 @@ class StyleSheet
     protected $cli = false;
 
     /**
+     * @var bool
+     */
+    protected $display = true;
+
+    /**
      * StyleSheet constructor.
      * @param \Throwable $throwable
+     * @param bool $display
      */
-    public function __construct(\Throwable $throwable)
+    public function __construct(\Throwable $throwable, $display = true)
     {
         $this->throwable = $throwable;
 
         if ('cli' === php_sapi_name()) {
             $this->cli = true;
         }
+
+        $this->display = $display;
     }
 
     /**
@@ -52,6 +60,14 @@ class StyleSheet
     public function isCli()
     {
         return $this->cli;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isDisplay()
+    {
+        return $this->display;
     }
 
     /**
@@ -166,7 +182,10 @@ class StyleSheet
 
         $trace = ltrim(str_replace('#', '<br />#', $this->throwable->getTraceAsString()), '<br />');
 
-        $content = <<<EOF
+        $content = '';
+
+        if ($this->isDisplay()) {
+            $content = <<<EOF
 <h2 class="block_exception clear_fix">
     <span class="exception_counter">1/1</span>
     <span class="exception_title"><abbr title="{$name}">{$name}</abbr> in <a title="{$this->throwable->getFile()} line {$this->throwable->getLine()}" ondblclick="var f=this.innerHTML;this.innerHTML=this.title;this.title=f;">{$filename} line {$this->throwable->getLine()}</a>:</span>
@@ -174,6 +193,7 @@ class StyleSheet
 </h2>
 <div class="block">{$trace}</div>
 EOF;
+        }
 
         if (isset($this->getHeaders()['Content-Type'])) {
             if (false !== strpos($this->getHeaders()['Content-Type'], 'application/json')) {

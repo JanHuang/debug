@@ -29,7 +29,6 @@ class Handler
      */
     protected $debug;
 
-
     /**
      * Handler constructor.
      * @param Debug $debug
@@ -74,7 +73,7 @@ class Handler
             $serverInternalErrorException = new FatalError($error['message']);
             $serverInternalErrorException->setFile($error['message']);
             $serverInternalErrorException->setLine($error['line']);
-            $this->debug->output(new Wrapper($serverInternalErrorException));
+            $this->debug->output(new Wrapper($serverInternalErrorException, $this->debug->isDisplay()));
         }
     }
 
@@ -83,7 +82,7 @@ class Handler
      */
     public function exceptionHandle(\Throwable $throwable)
     {
-        $this->debug->output(new Wrapper($throwable));
+        $this->debug->output(new Wrapper($throwable, $this->debug->isDisplay()));
     }
 
     /**
