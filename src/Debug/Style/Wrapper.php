@@ -57,7 +57,13 @@ class Wrapper
      */
     public function getHeaders()
     {
-        return $this->exception->getHeaders();
+        if ($this->exception instanceof Exception) {
+            return $this->exception->getHeaders();
+        }
+
+        return [
+            'Content-Type' => 'text/html; charset=utf-8;'
+        ];
     }
 
     /**
@@ -65,7 +71,11 @@ class Wrapper
      */
     public function getStatusCode()
     {
-        return $this->exception->getCode();
+        if ($this->exception instanceof Exception) {
+            return $this->exception->getCode();
+        }
+
+        return 500;
     }
 
     /**
