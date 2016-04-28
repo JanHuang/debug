@@ -26,7 +26,7 @@ class Wrapper
     /**
      * @var \Exception|HttpExceptionInterface
      */
-    private $exception;
+    private $throwable;
 
     /**
      * @var StyleSheet
@@ -39,9 +39,17 @@ class Wrapper
      */
     public function __construct(\Throwable $throwable, $display = true)
     {
-        $this->exception = $throwable;
+        $this->throwable = $throwable;
 
         $this->style = new StyleSheet($throwable, $display);
+    }
+
+    /**
+     * @return \Exception|HttpExceptionInterface|\Throwable
+     */
+    public function getThrowable()
+    {
+        return $this->throwable;
     }
 
     /**

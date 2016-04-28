@@ -150,6 +150,8 @@ class Debug
     {
         if (!$this->isDisplay() && null !== $this->logger) {
             $this->logger->error($wrapper->getStyleSheet()->getTitle(), [
+                'file' => $wrapper->getThrowable()->getFile(),
+                'line' => $wrapper->getThrowable()->getLine(),
                 'status' => $wrapper->getStyleSheet()->getStatusCode(),
                 'get' => $_GET,
                 'post' => $_POST
