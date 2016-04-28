@@ -109,7 +109,7 @@ class StyleSheet
             return $this->getCliContent();
         }
 
-        if (method_exists($this->throwable, 'getContent') && '' !== ($content = $this->throwable->getContent())) {
+        if (method_exists($this->throwable, 'getContent') && !empty($content = $this->throwable->getContent())) {
             return $content;
         }
 
