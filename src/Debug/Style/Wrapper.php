@@ -159,7 +159,7 @@ EOF;
             }
         }
 
-        if ('' !== ($content = $this->exception->getContent())) {
+        if ($this->exception instanceof Exception && '' !== ($content = $this->exception->getContent())) {
             echo $content;
         } else {
             echo $this->style->getHtml();
