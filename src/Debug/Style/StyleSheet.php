@@ -97,6 +97,10 @@ class StyleSheet
      */
     public function getStatusCode()
     {
+        if ($this->throwable instanceof HttpException) {
+            return $this->throwable->getStatusCode();
+        }
+
         return $this->throwable->getCode();
     }
 

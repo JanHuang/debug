@@ -1,6 +1,5 @@
 # Debug
 
-
 [![Latest Stable Version](https://poser.pugx.org/fastd/debug/v/stable)](https://packagist.org/packages/fastd/debug) [![Total Downloads](https://poser.pugx.org/fastd/debug/downloads)](https://packagist.org/packages/fastd/debug) [![Latest Unstable Version](https://poser.pugx.org/fastd/debug/v/unstable)](https://packagist.org/packages/fastd/debug) [![License](https://poser.pugx.org/fastd/debug/license)](https://packagist.org/packages/fastd/debug)
 
 支持自定义错误页面，自定义响应格式，响应头，支持 fatal error 捕捉，日志纪录等功能。
