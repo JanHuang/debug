@@ -149,7 +149,7 @@ class Debug
     public function output(Wrapper $wrapper)
     {
         if (!$this->isDisplay() && null !== $this->logger) {
-            $this->logger->error($wrapper->getStyleSheet()->getTitle(), [
+            $this->logger->error($wrapper->getStyleSheet()->getMessage(), [
                 'file' => $wrapper->getThrowable()->getFile(),
                 'line' => $wrapper->getThrowable()->getLine(),
                 'status' => $wrapper->getStyleSheet()->getStatusCode(),
