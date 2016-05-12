@@ -61,12 +61,21 @@ class Wrapper
     }
 
     /**
+     * @param int
+     * @return int
+     */
+    protected function filterStatusCode($statusCode)
+    {
+        return ($statusCode < 100 || $statusCode > 505) ? 500 : $statusCode;
+    }
+
+    /**
      * @return int
      */
     public function send()
     {
         if (!headers_sent() && !$this->style->isCli()) {
-            header(sprintf('HTTP/1.1 %s', $this->style->getStatusCode()));
+            header(sprintf('HTTP/1.1 %s', $this->filterStatusCode($this->style->getStatusCode())));
             foreach ($this->style->getHeaders() as $name => $value) {
                 header($name . ': ' . $value, false);
             }
