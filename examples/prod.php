@@ -18,4 +18,4 @@ use FastD\Debug\Debug;
 
 Debug::enable(false);
 
-trigger_error('demo');
+echo abc();

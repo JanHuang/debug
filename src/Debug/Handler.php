@@ -39,9 +39,15 @@ class Handler
 
         set_exception_handler([$this, 'exceptionHandle']);
 
-        set_error_handler([$this, 'errorHandle']);
-
         register_shutdown_function([$this, 'fatalErrorHandler']);
+
+        if (null === $prev = set_error_handler([$this, 'errorHandle'])) {
+            restore_error_handler();
+
+            set_error_handler([$this, 'errorHandle']);
+        };
+
+        restore_error_handler();
     }
 
     final private function __clone(){}
@@ -69,7 +75,7 @@ class Handler
     {
         $error = error_get_last();
 
-        if ($error) {
+        if ($error && $error['type'] == E_ERROR) {
             $serverInternalErrorException = new FatalError($error['message']);
             $serverInternalErrorException->setFile($error['message']);
             $serverInternalErrorException->setLine($error['line']);
