@@ -56,7 +56,6 @@ class Debug
 
         if ('cli' !== php_sapi_name()) {
             ini_set('display_errors', 0);
-
         } elseif (!ini_get('log_errors') || ini_get('error_log')) {
             ini_set('display_errors', 1);
         }
