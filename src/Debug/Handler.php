@@ -40,14 +40,8 @@ class Handler
         set_exception_handler([$this, 'exceptionHandle']);
 
         register_shutdown_function([$this, 'fatalErrorHandler']);
-
-        if (null === $prev = set_error_handler([$this, 'errorHandle'])) {
-            restore_error_handler();
-
-            set_error_handler([$this, 'errorHandle']);
-        };
-
-        restore_error_handler();
+        
+        set_error_handler([$this, 'errorHandle']);
     }
 
     final private function __clone(){}
