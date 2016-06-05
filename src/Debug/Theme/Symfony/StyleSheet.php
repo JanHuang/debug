@@ -12,7 +12,7 @@
  * WebSite: http://www.janhuang.me
  */
 
-namespace FastD\Debug\Style;
+namespace FastD\Debug\Theme\Symfony;
 
 use FastD\Debug\Exceptions\Http\HttpException;
 

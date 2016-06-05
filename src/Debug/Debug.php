@@ -14,7 +14,7 @@
 
 namespace FastD\Debug;
 
-use FastD\Debug\Style\Wrapper;
+use FastD\Debug\Theme\Symfony\StyleSheet;
 use Monolog\Logger;
 use ErrorException;
 use Throwable;
@@ -30,6 +30,11 @@ class Debug
      * @var static
      */
     protected static $handler;
+
+    /**
+     * @var ThemeInterface|StyleSheet
+     */
+    protected $theme = StyleSheet::class;
 
     /**
      * @var bool
@@ -88,6 +93,30 @@ class Debug
     public function getLogger()
     {
         return $this->logger;
+    }
+
+    /**
+     * @param $theme
+     * @return $this
+     * @throws ErrorException
+     */
+    public function setTheme($theme)
+    {
+        if (!($theme instanceof ThemeInterface)) {
+            throw new ErrorException(sprintf('Debug theme must be instance ["%s"]', ThemeInterface::class));
+        }
+
+        $this->theme = $theme;
+
+        return $this;
+    }
+
+    /**
+     * @return ThemeInterface
+     */
+    public function getTheme()
+    {
+        return is_object($this->theme) ? $this->theme : new $this->theme;
     }
 
     /**

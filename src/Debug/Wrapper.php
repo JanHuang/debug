@@ -12,7 +12,7 @@
  * WebSite: http://www.janhuang.me
  */
 
-namespace FastD\Debug\Style;
+namespace FastD\Debug;
 
 use FastD\Debug\Exceptions\Http\HttpExceptionInterface;
 
