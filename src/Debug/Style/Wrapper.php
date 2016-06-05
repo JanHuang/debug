@@ -85,4 +85,9 @@ class Wrapper
 
         return 0;
     }
+
+    public static function output(\Throwable $throwable)
+    {
+        echo $throwable->getMessage();
+    }
 }

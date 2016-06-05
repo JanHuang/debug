@@ -14,8 +14,10 @@
 
 namespace FastD\Debug;
 
-use Monolog\Logger;
 use FastD\Debug\Style\Wrapper;
+use Monolog\Logger;
+use ErrorException;
+use Throwable;
 
 /**
  * Class Debug
@@ -25,9 +27,9 @@ use FastD\Debug\Style\Wrapper;
 class Debug
 {
     /**
-     * @var Debug
+     * @var static
      */
-    protected static $debug;
+    protected static $handler;
 
     /**
      * @var bool
@@ -35,53 +37,45 @@ class Debug
     protected $display = true;
 
     /**
-     * @var array
-     */
-    protected $errorPage = [];
-
-    /**
      * @var Logger
      */
     protected $logger;
 
     /**
-     * @param bool|true   $display
+     * @var bool
+     */
+    protected $booted = false;
+
+    /**
+     * Debug constructor.
+     * @param bool $display
      * @param Logger|null $logger
      */
-    public function __construct($display = true, Logger $logger = null)
+    protected function __construct($display = true, Logger $logger = null)
     {
-        $this->display = $display;
+        error_reporting(null);
 
-        $this->setLogger($logger);
-
-        if ('cli' !== php_sapi_name()) {
+        if ('cli' !== PHP_SAPI) {
             ini_set('display_errors', 0);
         } elseif (!ini_get('log_errors') || ini_get('error_log')) {
             ini_set('display_errors', 1);
         }
-    }
 
-    /**
-     * @param Logger $logger
-     * @return $this
-     */
-    public function setLogger(Logger $logger = null)
-    {
+        $this->display = $display;
+
         $this->logger = $logger;
-
-        return $this;
     }
 
     /**
-     * @return Logger
+     * @return bool
      */
-    public function getLogger()
+    public function isBooted()
     {
-        return $this->logger;
+        return $this->booted;
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function isDisplay()
     {
@@ -89,41 +83,25 @@ class Debug
     }
 
     /**
-     * @param $code
-     * @param $content
-     * @return $this
+     * @return Logger|null
      */
-    public function setErrorPage($code, $content)
+    public function getLogger()
     {
-        $this->errorPage[$code] = $content;
-
-        return $this;
+        return $this->logger;
     }
 
     /**
-     * @param $code
-     * @return bool|string
+     * @param bool $display
+     * @param Logger|null $logger
+     * @return Debug
      */
-    public function getErrorPage($code)
+    public static function getHandler($display = true, Logger $logger = null)
     {
-        if (!$this->hasErrorPage($code)) {
-            return false;
+        if (null === static::$handler) {
+            static::$handler = new static($display, $logger);
         }
 
-        if (file_exists($this->errorPage[$code])) {
-            return file_get_contents($this->errorPage[$code]);
-        }
-
-        return $this->errorPage[$code];
-    }
-
-    /**
-     * @param $code
-     * @return bool
-     */
-    public function hasErrorPage($code)
-    {
-        return isset($this->errorPage[$code]) ? $this->errorPage[$code] : false;
+        return static::$handler;
     }
 
     /**
@@ -133,30 +111,97 @@ class Debug
      */
     public static function enable($display = true, Logger $logger = null)
     {
-        if (null === static::$debug) {
-            static::$debug = new static($display, $logger);
-            Handler::register(static::$debug);
+        $handler = static::getHandler($display, $logger);
+
+        if ($handler->isBooted()) {
+            return $handler;
         }
 
-        return static::$debug;
+        // 捕捉一切异常与错误
+        static::enableError($handler);
+
+        static::enableException($handler);
+
+        return $handler;
     }
 
     /**
-     * @param Wrapper $wrapper
-     * @return int|void
+     * @param Debug|null $debug
+     * @return void
      */
-    public function output(Wrapper $wrapper)
+    protected static function enableError(Debug $debug = null)
     {
-        if (!$this->isDisplay() && null !== $this->logger) {
-            $this->logger->error($wrapper->getStyleSheet()->getMessage(), [
-                'file' => $wrapper->getThrowable()->getFile(),
-                'line' => $wrapper->getThrowable()->getLine(),
-                'status' => $wrapper->getStyleSheet()->getStatusCode(),
-                'get' => $_GET,
-                'post' => $_POST
-            ]);
+        $handler = null === $debug ? static::getHandler() : $debug;
+
+        register_shutdown_function([$handler, 'handleFatalError']);
+
+        if ($prev = set_error_handler([$handler, 'handleError'])) {
+            restore_error_handler();
+            set_error_handler([$handler, 'handleError']);
         }
 
-        return $wrapper->send();
+        unset($prev);
+    }
+
+    /**
+     * @param Debug|null $debug
+     * @return void
+     */
+    protected static function enableException(Debug $debug = null)
+    {
+        $handler = null === $debug ? static::getHandler() : $debug;
+
+        if ($prev = set_exception_handler([$handler, 'handleException'])) {
+            restore_exception_handler();
+            set_exception_handler([$handler, 'handleException']);
+        }
+
+        unset($prev);
+    }
+
+    /**
+     * 将错误托管給 exception(handleException) 处理。
+     *
+     * @param $code
+     * @param $message
+     * @param $file
+     * @param $line
+     * @throws ErrorException
+     */
+    public function handleError($code, $message, $file, $line)
+    {
+        throw new ErrorException($message, $code, E_ERROR, $file, $line);
+    }
+
+    /**
+     * 将错误托管給 exception(handleException) 处理。
+     *
+     * @throws ErrorException
+     */
+    public function handleFatalError()
+    {
+        if (($error = error_get_last()) && $error['type'] == E_ERROR) {
+            self::handleError($error['type'], $error['message'], $error['file'], $error['line']);
+        }
+    }
+
+    /**
+     * 抛给 Wrapper 对象处理
+     *
+     * @param Throwable $throwable
+     * @return void
+     */
+    public function handleException(Throwable $throwable)
+    {
+        $this->wrapper($throwable);
+    }
+
+    /**
+     * @param Throwable $throwable
+     * @return void
+     */
+    public function wrapper(Throwable $throwable)
+    {
+        Wrapper::output($throwable);
     }
 }

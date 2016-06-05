@@ -21,25 +21,5 @@ namespace FastD\Debug\Exceptions;
  */
 class Exception extends \ErrorException
 {
-    /**
-     * @param $file
-     * @return $this
-     */
-    public function setFile($file)
-    {
-        $this->file = $file;
-
-        return $this;
-    }
-
-    /**
-     * @param $line
-     * @return $this
-     */
-    public function setLine($line)
-    {
-        $this->line = $line;
-
-        return $this;
-    }
+    
 }
