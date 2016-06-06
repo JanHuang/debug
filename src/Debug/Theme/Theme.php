@@ -25,79 +25,14 @@ abstract class Theme
     protected $throwable;
 
     /**
-     * @var bool
-     */
-    protected $cli = false;
-
-    /**
-     * @var bool
-     */
-    protected $display = true;
-
-    /**
      * Theme constructor.
      * @param Throwable $throwable
-     * @param bool $display
      */
-    public function __construct(Throwable $throwable, $display = true)
+    public function __construct(Throwable $throwable)
     {
-        if ('cli' === php_sapi_name()) {
-            $this->cli = true;
-        }
-
         $this->throwable = $throwable;
-
-        $this->display = $display;
     }
-
-    /**
-     * @return bool
-     */
-    public function isCli()
-    {
-        return $this->cli;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isDisplay()
-    {
-        return $this->display;
-    }
-
-    /**
-     * @return string
-     */
-    public function getMessage()
-    {
-        return $this->throwable->getMessage();
-    }
-
-    /**
-     * @return array
-     */
-    public function getHeaders()
-    {
-
-    }
-
-    /**
-     * @return int|mixed
-     */
-    public function getStatusCode()
-    {
-
-    }
-
-    /**
-     * @return string
-     */
-    public function getContent()
-    {
-        return $this->isCli() ? $this->getCli() : $this->getHtml();
-    }
-
+    
     /**
      * @return string
      */
@@ -114,15 +49,35 @@ abstract class Theme
     /**
      * @return string
      */
-    abstract public function getTitle();
-
-    /**
-     * @return string
-     */
     abstract public function getHtml();
 
     /**
      * @return string
      */
-    abstract public function getCli();
+    public function getCli()
+    {
+        $content = '';
+
+        $path = $this->throwable->getFile() . ': ' . $this->throwable->getLine();
+        $length = strlen($path);
+
+        if ('WIN' === strtoupper(substr(PHP_OS, 0, 3))) {
+            $content .= PHP_EOL . PHP_EOL;
+            $content .= '[' . $this->getName() . ']' . PHP_EOL;
+            $content .= $this->throwable->getMessage();
+            $content .= $path . PHP_EOL;
+            $content .= PHP_EOL;
+            return $content;
+        }
+
+        $content .= PHP_EOL;
+        $content .= chr(27) . '[41m' . str_repeat(' ', $length + 6) . chr(27) . "[0m" . PHP_EOL;
+        $content .= chr(27) . '[41m   ' . '[' . $this->getName() . ']   ' . str_repeat(' ', ($length - strlen($this->getName()) - 2)) . chr(27) . "[0m" . PHP_EOL;
+        $content .= chr(27) . '[41m   ' . $this->throwable->getMessage() . str_repeat(' ', $length - strlen($this->throwable->getMessage())) . '   ' . chr(27) . "[0m" . PHP_EOL;
+        $content .= chr(27) . '[41m   ' . $path . '   ' . chr(27) . "[0m" . PHP_EOL;
+        $content .= chr(27) . '[41m' . str_repeat(' ', $length + 6) . chr(27) . "[0m" . PHP_EOL;
+        $content .= PHP_EOL;
+
+        return $content;
+    }
 }

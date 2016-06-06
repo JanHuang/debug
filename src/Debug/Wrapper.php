@@ -40,6 +40,11 @@ class Wrapper
     protected $style;
 
     /**
+     * @var bool
+     */
+    protected $cli;
+
+    /**
      * Wrapper constructor.
      * @param Debug $debug
      * @param Throwable $throwable
@@ -52,9 +57,45 @@ class Wrapper
 
         $theme = $debug->getTheme();
 
-        $this->style = new $theme($throwable, $debug->isDisplay());
+        $this->style = new $theme($throwable);
+
+        $this->cli = 'cli' === PHP_SAPI ? true : false;
 
         unset($theme);
+    }
+
+    /**
+     * @return int
+     */
+    public function getStatusCode()
+    {
+        return $this->throwable->getCode();
+    }
+
+    /**
+     * @return array
+     */
+    public function getHeaders()
+    {
+        return [
+            'Content-Type' => 'text/html'
+        ];
+    }
+
+    /**
+     * @return string
+     */
+    public function getTitle()
+    {
+        switch ($this->getStatusCode()) {
+            case 404:
+                $title = 'Sorry, the page you are looking for could not be found.';
+                break;
+            default:
+                $title = 'Whoops, looks like something went wrong.';
+        }
+
+        return $title;
     }
 
     /**
@@ -73,12 +114,19 @@ class Wrapper
         return $this->style;
     }
 
+    public function isCli()
+    {
+        return $this->cli;
+    }
+
     /**
      * @param int
      * @return int
      */
-    protected function filterStatusCode($statusCode)
+    protected function filterStatusCode()
     {
+        $statusCode = $this->getStatusCode();
+
         return ($statusCode < 100 || $statusCode > 505) ? 500 : $statusCode;
     }
 
@@ -87,20 +135,44 @@ class Wrapper
      */
     public function send()
     {
-        /*if (!headers_sent() && !$this->style->isCli()) {
-            header(sprintf('HTTP/1.1 %s', $this->filterStatusCode($this->style->getStatusCode())));
-            foreach ($this->style->getHeaders() as $name => $value) {
+        if ($this->isCli()) {
+            echo $this->getStyleSheet()->getCli();
+            return 0;
+        }
+
+        if (!headers_sent()) {
+            header(sprintf('HTTP/1.1 %s', $this->filterStatusCode()));
+            foreach ($this->getHeaders() as $name => $value) {
                 header($name . ': ' . $value, false);
             }
-        }*/
+        }
 
-        echo $this->throwable->getMessage();
+        $self = $this;
 
-        $render = $this->handler->getBar()->getJavascriptRenderer();
+        echo (function () use ($self) {
 
-        $render["messages"]->addMessage("hello world!");
+            $content = $self->getStyleSheet()->getHtml();
+            $title = $self->getTitle();
+            $stylesheet = $self->getStyleSheet()->getStyleSheet();
 
-        echo $render->render();
+            return <<<EOF
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>{$title}</title>
+        <meta name="robots" content="noindex,nofollow" />
+        <style>{$stylesheet}</style>
+    </head>
+    <body>
+    <div id="content" class="reset">
+    <h1>{$title}</h1>
+    {$content}
+    </div>
+    </body>
+</html>
+EOF;
+        })();
 
         return 0;
     }

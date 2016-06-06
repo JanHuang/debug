@@ -69,9 +69,7 @@ class Debug
      */
     protected function __construct($display = true, Logger $logger = null)
     {
-        error_reporting(null);
-
-        if ('cli' !== PHP_SAPI) {
+        if ('cli' === PHP_SAPI) {
             ini_set('display_errors', 0);
         } elseif (!ini_get('log_errors') || ini_get('error_log')) {
             ini_set('display_errors', 1);
@@ -218,8 +216,6 @@ class Debug
     protected static function enableDebugBar(Debug $debug = null)
     {
         $handler = null === $debug ? static::getHandler() : $debug;
-
-        $handler->bar = new StandardDebugBar();
 
         unset($handler);
     }
