@@ -14,7 +14,7 @@
 
 namespace FastD\Debug;
 
-use FastD\Debug\Exceptions\Http\HttpExceptionInterface;
+use Throwable;
 
 /**
  * Class Wrapper
@@ -23,29 +23,29 @@ use FastD\Debug\Exceptions\Http\HttpExceptionInterface;
  */
 class Wrapper
 {
+    protected $handler;
+
     /**
-     * @var \Exception|HttpExceptionInterface
+     * @var Throwable
      */
     private $throwable;
 
     /**
-     * @var StyleSheet
+     * @var ThemeInterface
      */
     protected $style;
 
-    /**
-     * @param \Throwable $throwable
-     * @param bool $display
-     */
-    public function __construct(\Throwable $throwable, $display = true)
+    public function __construct(Debug $debug, Throwable $throwable)
     {
+        $this->handler = $debug;
+
         $this->throwable = $throwable;
 
-        $this->style = new StyleSheet($throwable, $display);
+        $this->style = $debug->getTheme();
     }
 
     /**
-     * @return \Exception|HttpExceptionInterface|\Throwable
+     * @return Throwable
      */
     public function getThrowable()
     {
@@ -53,7 +53,7 @@ class Wrapper
     }
 
     /**
-     * @return StyleSheet
+     * @return ThemeInterface
      */
     public function getStyleSheet()
     {

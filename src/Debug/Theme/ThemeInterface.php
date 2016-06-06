@@ -20,4 +20,6 @@ interface ThemeInterface
     public function getHtml();
 
     public function getCli();
+
+    public function getContent();
 }
