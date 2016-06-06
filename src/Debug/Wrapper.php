@@ -14,6 +14,7 @@
 
 namespace FastD\Debug;
 
+use FastD\Debug\Theme\Theme;
 use Throwable;
 
 /**
@@ -34,10 +35,15 @@ class Wrapper
     private $throwable;
 
     /**
-     * @var ThemeInterface
+     * @var Theme
      */
     protected $style;
 
+    /**
+     * Wrapper constructor.
+     * @param Debug $debug
+     * @param Throwable $throwable
+     */
     public function __construct(Debug $debug, Throwable $throwable)
     {
         $this->handler = $debug;
@@ -46,8 +52,9 @@ class Wrapper
 
         $theme = $debug->getTheme();
 
-        print_r($theme);
-        die;
+        $this->style = new $theme($throwable, $debug->isDisplay());
+
+        unset($theme);
     }
 
     /**
@@ -59,7 +66,7 @@ class Wrapper
     }
 
     /**
-     * @return ThemeInterface
+     * @return Theme
      */
     public function getStyleSheet()
     {
@@ -107,8 +114,6 @@ class Wrapper
     public static function output(Debug $debug, Throwable $throwable)
     {
         $wrapper = new static($debug, $throwable);
-
-        print_r($wrapper);
 
         $wrapper->send();
     }

@@ -48,7 +48,7 @@ class Debug
     protected $bar;
     
     /**
-     * @var ThemeInterface|StyleSheet
+     * @var Theme|StyleSheet
      */
     protected $theme = StyleSheet::class;
 
