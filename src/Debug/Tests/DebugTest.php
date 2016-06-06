@@ -14,10 +14,22 @@
 
 namespace FastD\Debug\Tests;
 
+use FastD\Debug\Debug;
+use FastD\Debug\Tests\Exceptions\NotFoundException;
+
 class DebugTest extends \PHPUnit_Framework_TestCase
 {
+    public function setUp()
+    {
+        Debug::enable();
+    }
+
+    /**
+     * @expectedException \ErrorException
+     * @expectedExceptionMessage Undefined
+     */
     public function testError()
     {
-
+        echo $a;
     }
 }

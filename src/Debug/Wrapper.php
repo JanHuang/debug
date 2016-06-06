@@ -14,6 +14,7 @@
 
 namespace FastD\Debug;
 
+use FastD\Debug\Exceptions\HttpException;
 use FastD\Debug\Theme\Theme;
 use Throwable;
 
@@ -69,7 +70,9 @@ class Wrapper
      */
     public function getStatusCode()
     {
-        return $this->throwable->getCode();
+        return $this->throwable instanceof HttpException
+            ? $this->throwable->getStatusCode()
+            : $this->throwable->getCode();
     }
 
     /**
@@ -77,9 +80,15 @@ class Wrapper
      */
     public function getHeaders()
     {
-        return [
-            'Content-Type' => 'text/html'
+        $headers = [
+            'Content-Type' => 'text/html;'
         ];
+
+        if ($this->throwable instanceof HttpException && !empty($this->throwable->getHeaders())) {
+            $headers = $this->throwable->getHeaders();
+        }
+
+        return $headers;
     }
 
     /**
@@ -114,6 +123,9 @@ class Wrapper
         return $this->style;
     }
 
+    /**
+     * @return bool
+     */
     public function isCli()
     {
         return $this->cli;
@@ -148,11 +160,14 @@ class Wrapper
         }
 
         $self = $this;
+        $title = $this->getTitle();
 
-        echo (function () use ($self) {
+        echo (function () use ($self, $title) {
 
-            $content = $self->getStyleSheet()->getHtml();
-            $title = $self->getTitle();
+            $content = $self->handler->isDisplay()
+                ? $self->getStyleSheet()->getHtml()
+                : '';
+
             $stylesheet = $self->getStyleSheet()->getStyleSheet();
 
             return <<<EOF
