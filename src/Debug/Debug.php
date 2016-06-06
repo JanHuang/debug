@@ -14,8 +14,7 @@
 
 namespace FastD\Debug;
 
-use DebugBar\DataCollector\RequestDataCollector;
-use DebugBar\StandardDebugBar;
+use FastD\Debug\Collectors\RequestCollector;
 use FastD\Debug\Theme\Symfony\StyleSheet;
 use FastD\Debug\Theme\Theme;
 use DebugBar\DebugBar;
@@ -137,6 +136,17 @@ class Debug
     }
 
     /**
+     * @param $data
+     * @return $this
+     */
+    public function dump($data)
+    {
+        if (!$this->isDisplay()) {
+            return;
+        }
+    }
+
+    /**
      * @param bool $display
      * @param Logger|null $logger
      * @return Debug
@@ -168,7 +178,9 @@ class Debug
 
         static::enableException($handler);
 
-        static::enableDebugBar($handler);
+        if ($handler->isDisplay()) {
+            static::enableDebugBar($handler);
+        }
 
         return $handler;
     }
@@ -217,7 +229,15 @@ class Debug
     {
         $handler = null === $debug ? static::getHandler() : $debug;
 
-        unset($handler);
+        $handler->bar = new DebugBar();
+
+        $handler->bar->addCollector(new RequestCollector());
+        $handler->bar->addCollector(new PhpInfoCollector());
+        $handler->bar->addCollector(new MessagesCollector());
+        $handler->bar->addCollector(new RequestDataCollector());
+        $handler->bar->addCollector(new TimeDataCollector());
+        $handler->bar->addCollector(new MemoryCollector());
+        $handler->bar->addCollector(new ExceptionsCollector());
     }
 
     /**

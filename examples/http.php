@@ -13,4 +13,4 @@ include __DIR__ . '/../vendor/autoload.php';
 
 \FastD\Debug\Debug::enable();
 
-echo ab();
+throw new \FastD\Debug\Tests\Exceptions\NotFoundException('Damn it.');

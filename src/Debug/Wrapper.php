@@ -33,7 +33,7 @@ class Wrapper
     /**
      * @var Throwable
      */
-    private $throwable;
+    protected $throwable;
 
     /**
      * @var Theme
@@ -143,26 +143,14 @@ class Wrapper
     }
 
     /**
-     * @return int
+     * @return string
      */
-    public function send()
+    protected function wrapperOutput()
     {
-        if ($this->isCli()) {
-            echo $this->getStyleSheet()->getCli();
-            return 0;
-        }
-
-        if (!headers_sent()) {
-            header(sprintf('HTTP/1.1 %s', $this->filterStatusCode()));
-            foreach ($this->getHeaders() as $name => $value) {
-                header($name . ': ' . $value, false);
-            }
-        }
-
         $self = $this;
         $title = $this->getTitle();
 
-        echo (function () use ($self, $title) {
+        return (function () use ($self, $title) {
 
             $content = $self->handler->isDisplay()
                 ? $self->getStyleSheet()->getHtml()
@@ -188,6 +176,33 @@ class Wrapper
 </html>
 EOF;
         })();
+    }
+
+    /**
+     * @return int
+     */
+    public function send()
+    {
+        if ($this->isCli()) {
+            echo $this->getStyleSheet()->getCli();
+            return 0;
+        }
+
+        if (!headers_sent()) {
+            header(sprintf('HTTP/1.1 %s', $this->filterStatusCode()));
+            foreach ($this->getHeaders() as $name => $value) {
+                header($name . ': ' . $value, false);
+            }
+        }
+
+        echo $this->wrapperOutput();
+
+        if ($this->handler->isDisplay()) {
+            $render = $this->handler->getBar()->getJavascriptRenderer();
+
+            echo '<pre>';
+            print_r($render->getAssets());
+        }
 
         return 0;
     }
