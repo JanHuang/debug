@@ -23,6 +23,9 @@ use Throwable;
  */
 class Wrapper
 {
+    /**
+     * @var Debug
+     */
     protected $handler;
 
     /**
@@ -41,7 +44,10 @@ class Wrapper
 
         $this->throwable = $throwable;
 
-        $this->style = $debug->getTheme();
+        $theme = $debug->getTheme();
+
+        print_r($theme);
+        die;
     }
 
     /**
@@ -74,20 +80,36 @@ class Wrapper
      */
     public function send()
     {
-        if (!headers_sent() && !$this->style->isCli()) {
+        /*if (!headers_sent() && !$this->style->isCli()) {
             header(sprintf('HTTP/1.1 %s', $this->filterStatusCode($this->style->getStatusCode())));
             foreach ($this->style->getHeaders() as $name => $value) {
                 header($name . ': ' . $value, false);
             }
-        }
+        }*/
 
-        echo $this->style->getContent();
+        echo $this->throwable->getMessage();
+
+        $render = $this->handler->getBar()->getJavascriptRenderer();
+
+        $render["messages"]->addMessage("hello world!");
+
+        echo $render->render();
 
         return 0;
     }
 
-    public static function output(\Throwable $throwable)
+    /**
+     * 输出错误
+     *
+     * @param Debug $debug
+     * @param Throwable $throwable
+     */
+    public static function output(Debug $debug, Throwable $throwable)
     {
-        echo $throwable->getMessage();
+        $wrapper = new static($debug, $throwable);
+
+        print_r($wrapper);
+
+        $wrapper->send();
     }
 }

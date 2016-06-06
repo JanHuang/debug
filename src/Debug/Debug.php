@@ -14,7 +14,11 @@
 
 namespace FastD\Debug;
 
+use DebugBar\DataCollector\RequestDataCollector;
+use DebugBar\StandardDebugBar;
 use FastD\Debug\Theme\Symfony\StyleSheet;
+use FastD\Debug\Theme\Theme;
+use DebugBar\DebugBar;
 use Monolog\Logger;
 use ErrorException;
 use Throwable;
@@ -32,6 +36,18 @@ class Debug
     protected static $handler;
 
     /**
+     * @var Logger
+     */
+    protected $logger;
+
+    /**
+     * 依赖第三方组件: maximebf/debugbar
+     *
+     * @var DebugBar
+     */
+    protected $bar;
+    
+    /**
      * @var ThemeInterface|StyleSheet
      */
     protected $theme = StyleSheet::class;
@@ -40,11 +56,6 @@ class Debug
      * @var bool
      */
     protected $display = true;
-
-    /**
-     * @var Logger
-     */
-    protected $logger;
 
     /**
      * @var bool
@@ -102,8 +113,8 @@ class Debug
      */
     public function setTheme($theme)
     {
-        if (!($theme instanceof ThemeInterface)) {
-            throw new ErrorException(sprintf('Debug theme must be instance ["%s"]', ThemeInterface::class));
+        if (!($theme instanceof Theme)) {
+            throw new ErrorException(sprintf('Debug theme must be instance ["%s"]', Theme::class));
         }
 
         $this->theme = $theme;
@@ -112,11 +123,19 @@ class Debug
     }
 
     /**
-     * @return ThemeInterface
+     * @return Theme
      */
     public function getTheme()
     {
-        return is_object($this->theme) ? $this->theme : new $this->theme;
+        return $this->theme;
+    }
+
+    /**
+     * @return DebugBar
+     */
+    public function getBar()
+    {
+        return $this->bar;
     }
 
     /**
@@ -151,6 +170,8 @@ class Debug
 
         static::enableException($handler);
 
+        static::enableDebugBar($handler);
+
         return $handler;
     }
 
@@ -169,7 +190,7 @@ class Debug
             set_error_handler([$handler, 'handleError']);
         }
 
-        unset($prev);
+        unset($prev, $handler);
     }
 
     /**
@@ -185,7 +206,22 @@ class Debug
             set_exception_handler([$handler, 'handleException']);
         }
 
-        unset($prev);
+        unset($prev, $handler);
+    }
+
+    /**
+     * 开启调试栏
+     *
+     * @param Debug $debug
+     * @return void
+     */
+    protected static function enableDebugBar(Debug $debug = null)
+    {
+        $handler = null === $debug ? static::getHandler() : $debug;
+
+        $handler->bar = new StandardDebugBar();
+
+        unset($handler);
     }
 
     /**
@@ -231,6 +267,6 @@ class Debug
      */
     public function wrapper(Throwable $throwable)
     {
-        Wrapper::output($throwable);
+        Wrapper::output($this, $throwable);
     }
 }
