@@ -14,12 +14,6 @@
 
 namespace FastD\Debug;
 
-use DebugBar\DataCollector\ExceptionsCollector;
-use DebugBar\DataCollector\MemoryCollector;
-use DebugBar\DataCollector\MessagesCollector;
-use DebugBar\DataCollector\PhpInfoCollector;
-use DebugBar\DataCollector\RequestDataCollector;
-use DebugBar\DataCollector\TimeDataCollector;
 use FastD\Debug\Collectors\Collector;
 use FastD\Debug\Theme\Symfony\StyleSheet;
 use FastD\Debug\Theme\Theme;
@@ -49,7 +43,7 @@ class Debug
      *
      * @var DebugBar
      */
-    protected $bar = DebugBar::class;
+    protected $bar = null;
 
     /**
      * @var Collector[]
@@ -72,6 +66,11 @@ class Debug
     protected $booted = false;
 
     /**
+     * @var bool
+     */
+    protected $cliMode = false;
+
+    /**
      * Debug constructor.
      * @param bool $display
      * @param Logger|null $logger
@@ -87,6 +86,8 @@ class Debug
         $this->display = $display;
 
         $this->logger = $logger;
+
+        $this->cliMode = 'cli' === PHP_SAPI ? true : false;
     }
 
     /**
@@ -103,6 +104,14 @@ class Debug
     public function isDisplay()
     {
         return $this->display;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isCliMode()
+    {
+        return $this->cliMode;
     }
 
     /**
@@ -151,7 +160,7 @@ class Debug
      */
     public function dump($data)
     {
-        if (!$this->isDisplay()) {
+        if (!$this->bar) {
             return;
         }
 
@@ -193,7 +202,7 @@ class Debug
 
         static::enableException($handler);
 
-        if ($handler->isDisplay()) {
+        if ($handler->isDisplay() && !$handler->isCliMode()) {
             static::enableDebugBar($collectors);
         }
 
@@ -294,7 +303,7 @@ class Debug
      */
     public function handleException(Throwable $throwable)
     {
-        if ($this->isDisplay()) {
+        if (null !== $this->bar) {
             $this->getBar()->getCollector('exceptions')->addException($throwable);
         }
 

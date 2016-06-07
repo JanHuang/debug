@@ -41,11 +41,6 @@ class Wrapper
     protected $style;
 
     /**
-     * @var bool
-     */
-    protected $cli;
-
-    /**
      * Wrapper constructor.
      * @param Debug $debug
      * @param Throwable $throwable
@@ -59,8 +54,6 @@ class Wrapper
         $theme = $debug->getTheme();
 
         $this->style = new $theme($throwable);
-
-        $this->cli = 'cli' === PHP_SAPI ? true : false;
 
         unset($theme);
     }
@@ -124,14 +117,6 @@ class Wrapper
     }
 
     /**
-     * @return bool
-     */
-    public function isCli()
-    {
-        return $this->cli;
-    }
-
-    /**
      * @param int
      * @return int
      */
@@ -183,7 +168,7 @@ EOF;
      */
     public function send()
     {
-        if ($this->isCli()) {
+        if ($this->handler->isCliMode()) {
             echo $this->getStyleSheet()->getCli();
             return 0;
         }
