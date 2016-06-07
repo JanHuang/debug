@@ -34,7 +34,7 @@ $logger->pushHandler($stream);
 
 $debug = \FastD\Debug\Debug::enable(false, $logger);
 
-throw new \FastD\Debug\Exceptions\Http\NotFoundHttpException(404);
+throw new \Exception('test');
 ```
 
 自定义错误页面内容
