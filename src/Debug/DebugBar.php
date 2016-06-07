@@ -19,10 +19,9 @@ use DebugBar\DataCollector\PDO\TraceablePDO;
 use DebugBar\DataCollector\PhpInfoCollector;
 use DebugBar\DataCollector\RequestDataCollector;
 use DebugBar\DataCollector\TimeDataCollector;
-use FastD\Database\Fdb;
 use FastD\Debug\Collectors\DumpCollector;
 use DebugBar\JavascriptRenderer;
-use PDO;
+use FastD\Database\Fdb;
 
 /**
  * Class DebugBar
@@ -35,8 +34,6 @@ class DebugBar extends \DebugBar\DebugBar
         PhpInfoCollector::class,
         DumpCollector::class,
         RequestDataCollector::class,
-        ConfigCollector::class,
-        PDOCollector::class,
         TimeDataCollector::class,
         ExceptionsCollector::class,
         MemoryCollector::class,
@@ -54,18 +51,36 @@ class DebugBar extends \DebugBar\DebugBar
         }
     }
 
+    /**
+     * @param Fdb $fdb
+     * @return $this
+     * @throws \DebugBar\DebugBarException
+     */
     public function addFdb(Fdb $fdb)
     {
+        $fdb->createPool();
+
         $collections = new PDOCollector();
 
         foreach ($fdb as $name => $driverInterface) {
             $traceablePDO = new TraceablePDO($driverInterface->getPdo());
-
             $collections->addConnection($traceablePDO, $name);
         }
 
         $this->addCollector($collections);
         
+        return $this;
+    }
+
+    /**
+     * @param array $config
+     * @return $this
+     * @throws \DebugBar\DebugBarException
+     */
+    public function addConfig(array $config)
+    {
+        $this->addCollector(new ConfigCollector($config));
+
         return $this;
     }
     
@@ -119,6 +134,9 @@ class DebugBar extends \DebugBar\DebugBar
         }
     }
 
+    /**
+     *
+     */
     protected function outputEmpty()
     {
         echo '<body></body>';
