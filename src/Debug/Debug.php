@@ -14,10 +14,15 @@
 
 namespace FastD\Debug;
 
-use FastD\Debug\Collectors\RequestCollector;
+use DebugBar\DataCollector\ExceptionsCollector;
+use DebugBar\DataCollector\MemoryCollector;
+use DebugBar\DataCollector\MessagesCollector;
+use DebugBar\DataCollector\PhpInfoCollector;
+use DebugBar\DataCollector\RequestDataCollector;
+use DebugBar\DataCollector\TimeDataCollector;
+use FastD\Debug\Collectors\Collector;
 use FastD\Debug\Theme\Symfony\StyleSheet;
 use FastD\Debug\Theme\Theme;
-use DebugBar\DebugBar;
 use Monolog\Logger;
 use ErrorException;
 use Throwable;
@@ -44,7 +49,12 @@ class Debug
      *
      * @var DebugBar
      */
-    protected $bar;
+    protected $bar = DebugBar::class;
+
+    /**
+     * @var Collector[]
+     */
+    protected $collectors = [];
     
     /**
      * @var Theme|StyleSheet
@@ -144,6 +154,10 @@ class Debug
         if (!$this->isDisplay()) {
             return;
         }
+
+        $this->bar->getCollector('dump')->addMessage($data);
+
+        return $this;
     }
 
     /**
@@ -161,11 +175,19 @@ class Debug
     }
 
     /**
-     * @param bool|true   $display
+     * @param bool $display
      * @param Logger|null $logger
+     * @param array $collectors
      * @return Debug
      */
-    public static function enable($display = true, Logger $logger = null)
+    public static function enable($display = true, Logger $logger = null, array $collectors = [
+        PhpInfoCollector::class,
+        MessagesCollector::class,
+        RequestDataCollector::class,
+        TimeDataCollector::class,
+        MemoryCollector::class,
+        ExceptionsCollector::class,
+    ])
     {
         $handler = static::getHandler($display, $logger);
 
@@ -179,7 +201,7 @@ class Debug
         static::enableException($handler);
 
         if ($handler->isDisplay()) {
-            static::enableDebugBar($handler);
+            static::enableDebugBar($collectors);
         }
 
         return $handler;
@@ -220,24 +242,20 @@ class Debug
     }
 
     /**
-     * 开启调试栏
-     *
-     * @param Debug $debug
-     * @return void
+     * @param array $collectors
      */
-    protected static function enableDebugBar(Debug $debug = null)
+    protected static function enableDebugBar(array $collectors = [
+        PhpInfoCollector::class,
+        MessagesCollector::class,
+        RequestDataCollector::class,
+        TimeDataCollector::class,
+        MemoryCollector::class,
+        ExceptionsCollector::class,
+    ])
     {
-        $handler = null === $debug ? static::getHandler() : $debug;
+        $handler = static::getHandler();
 
-        $handler->bar = new DebugBar();
-
-        $handler->bar->addCollector(new RequestCollector());
-        $handler->bar->addCollector(new PhpInfoCollector());
-        $handler->bar->addCollector(new MessagesCollector());
-        $handler->bar->addCollector(new RequestDataCollector());
-        $handler->bar->addCollector(new TimeDataCollector());
-        $handler->bar->addCollector(new MemoryCollector());
-        $handler->bar->addCollector(new ExceptionsCollector());
+        $handler->bar = new DebugBar($collectors);
     }
 
     /**
@@ -263,6 +281,8 @@ class Debug
     {
         if (($error = error_get_last()) && $error['type'] == E_ERROR) {
             self::handleError($error['type'], $error['message'], $error['file'], $error['line']);
+        } else if ($this->bar instanceof DebugBar && $this->isDisplay()) {
+            $this->bar->output();
         }
     }
 

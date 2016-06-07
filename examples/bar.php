@@ -12,3 +12,4 @@
 include __DIR__ . '/../vendor/autoload.php';
 
 \FastD\Debug\Debug::enable();
+

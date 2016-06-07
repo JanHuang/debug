@@ -145,7 +145,7 @@ class Wrapper
     /**
      * @return string
      */
-    protected function wrapperOutput()
+    protected function wrapOutput()
     {
         $self = $this;
         $title = $this->getTitle();
@@ -195,14 +195,7 @@ EOF;
             }
         }
 
-        echo $this->wrapperOutput();
-
-        if ($this->handler->isDisplay()) {
-            $render = $this->handler->getBar()->getJavascriptRenderer();
-
-            echo '<pre>';
-            print_r($render->getAssets());
-        }
+        echo $this->wrapOutput();
 
         return 0;
     }
