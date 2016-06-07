@@ -284,7 +284,7 @@ class Debug
                 $list = headers_list();
                 foreach ($list as $value) {
                     list($name, $value) = explode(':', $value);
-                    if ($name == 'Content-type' && (false !== strpos(trim($value), 'text/html'))) {
+                    if (strtolower($name) == 'content-type' && (false !== strpos(trim($value), 'text'))) {
                         return true;
                     }
                 }

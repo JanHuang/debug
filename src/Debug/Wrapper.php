@@ -101,6 +101,35 @@ class Wrapper
     }
 
     /**
+     * @return string
+     */
+    public function getContent()
+    {
+        if ($this->handler->isCliMode()) {
+            return $this->getStyleSheet()->getCli();
+        }
+
+        if ((function () {
+            $list = headers_list();
+            foreach ($list as $value) {
+                list($name, $value) = explode(':', $value);
+                if (strtolower($name) == 'content-type' && (false !== strpos(trim($value), 'application'))) {
+                    return true;
+                }
+            }
+            return false;
+        })()) {
+            if ($this->throwable instanceof HttpException) {
+                return $this->throwable->getContent();
+            }
+
+            return $this->throwable->getMessage();
+        }
+
+        return $this->wrapOutput();
+    }
+
+    /**
      * @return Throwable
      */
     public function getThrowable()
@@ -168,21 +197,38 @@ EOF;
      */
     public function send()
     {
-        if ($this->handler->isCliMode()) {
-            echo $this->getStyleSheet()->getCli();
-            return 0;
-        }
-        
-        if (!headers_sent()) {
+        if (!headers_sent() && !$this->handler->isCliMode()) {
             header(sprintf('HTTP/1.1 %s', $this->filterStatusCode()));
             foreach ($this->getHeaders() as $name => $value) {
                 header($name . ': ' . $value, false);
             }
         }
 
-        echo $this->wrapOutput();
+        $this->log($this->getTitle());
+
+        echo $this->getContent();
 
         return 0;
+    }
+
+    /**
+     * @param $message
+     * @return bool
+     */
+    public function log($message)
+    {
+        if (null !== ($logger = $this->handler->getLogger())) {
+            return $logger->error($message, [
+                'error' => $this->getThrowable()->getMessage(),
+                'file'  => $this->getThrowable()->getFile(),
+                'line'  => $this->getThrowable()->getLine(),
+                'status_code' => $this->getStatusCode(),
+                'get'   => $_GET,
+                'post'  => $_POST
+            ]);
+        }
+
+        return false;
     }
 
     /**

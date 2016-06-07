@@ -18,13 +18,8 @@ use FastD\Debug\Debug;
 
 $debug = Debug::enable(false);
 
-class JsonException extends \FastD\Debug\Exceptions\Http\HttpException
+class PageException extends \FastD\Debug\Exceptions\HttpException
 {
-    public function __construct(array $data)
-    {
-        parent::__construct(json_encode($data));
-    }
-
     /**
      * Returns the status code.
      *
@@ -32,7 +27,7 @@ class JsonException extends \FastD\Debug\Exceptions\Http\HttpException
      */
     public function getStatusCode()
     {
-        return \FastD\Debug\Exceptions\Http\HttpExceptionInterface::HTTP_BAD_REQUEST;
+        return 400;
     }
 
     /**
@@ -46,6 +41,16 @@ class JsonException extends \FastD\Debug\Exceptions\Http\HttpException
             'Content-Type' => 'application/json; charset=utf-8'
         ];
     }
+
+    /**
+     * Returns response content.
+     *
+     * @return string
+     */
+    public function getContent()
+    {
+        return '{"name": "janhuang"}';
+    }
 }
 
-throw new JsonException(['name' => 'hello world']);
+throw new PageException();

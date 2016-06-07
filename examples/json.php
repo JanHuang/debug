@@ -12,17 +12,14 @@
  * WebSite: http://www.janhuang.me
  */
 
+use FastD\Debug\Exceptions\HttpException;
+
 include __DIR__ . '/../vendor/autoload.php';
 
 $debug = \FastD\Debug\Debug::enable();
 
-class JsonException extends \FastD\Debug\Exceptions\Http\HttpException
+class JsonException extends HttpException
 {
-    public function __construct(array $data)
-    {
-        parent::__construct(json_encode($data));
-    }
-
     /**
      * Returns the status code.
      *
@@ -30,7 +27,7 @@ class JsonException extends \FastD\Debug\Exceptions\Http\HttpException
      */
     public function getStatusCode()
     {
-        return \FastD\Debug\Exceptions\Http\HttpExceptionInterface::HTTP_BAD_REQUEST;
+        return '400';
     }
 
     /**
@@ -43,6 +40,29 @@ class JsonException extends \FastD\Debug\Exceptions\Http\HttpException
         return [
             'Content-Type' => 'application/json; charset=utf-8'
         ];
+    }
+
+    /**
+     * Returns response content.
+     *
+     * @return string
+     */
+    public function getContent()
+    {
+        // TODO: Implement getContent() method.
+    }
+
+    /**
+     * Construct the exception. Note: The message is NOT binary safe.
+     * @link http://php.net/manual/en/exception.construct.php
+     * @param string $message [optional] The Exception message to throw.
+     * @param int $code [optional] The Exception code.
+     * @param Exception $previous [optional] The previous exception used for the exception chaining. Since 5.3.0
+     * @since 5.1.0
+     */
+    public function __construct($message, $code = 400)
+    {
+        parent::__construct(json_encode($message), $code);
     }
 }
 
