@@ -280,19 +280,7 @@ class Debug
         } else if ($this->bar instanceof DebugBar && $this->isDisplay()) {
             // Shutdown script running.
             // If enable debug mode. Can be auto show debugbar into html page.
-            $isSend = (function () {
-                $list = headers_list();
-                foreach ($list as $value) {
-                    list($name, $value) = explode(':', $value);
-                    if (strtolower($name) == 'content-type' && (false !== strpos(trim($value), 'text'))) {
-                        return true;
-                    }
-                }
-                return false;
-            })();
-            if ($isSend) {
-                $this->bar->output();
-            }
+            $this->bar->output();
         }
     }
 

@@ -15,11 +15,14 @@ use DebugBar\DataCollector\ConfigCollector;
 use DebugBar\DataCollector\ExceptionsCollector;
 use DebugBar\DataCollector\MemoryCollector;
 use DebugBar\DataCollector\PDO\PDOCollector;
+use DebugBar\DataCollector\PDO\TraceablePDO;
 use DebugBar\DataCollector\PhpInfoCollector;
 use DebugBar\DataCollector\RequestDataCollector;
 use DebugBar\DataCollector\TimeDataCollector;
-use DebugBar\JavascriptRenderer;
+use FastD\Database\Fdb;
 use FastD\Debug\Collectors\DumpCollector;
+use DebugBar\JavascriptRenderer;
+use PDO;
 
 /**
  * Class DebugBar
@@ -38,6 +41,7 @@ class DebugBar extends \DebugBar\DebugBar
         ExceptionsCollector::class,
         MemoryCollector::class,
     ];
+    
     /**
      * DebugBar constructor.
      *
@@ -50,6 +54,21 @@ class DebugBar extends \DebugBar\DebugBar
         }
     }
 
+    public function addFdb(Fdb $fdb)
+    {
+        $collections = new PDOCollector();
+
+        foreach ($fdb as $name => $driverInterface) {
+            $traceablePDO = new TraceablePDO($driverInterface->getPdo());
+
+            $collections->addConnection($traceablePDO, $name);
+        }
+
+        $this->addCollector($collections);
+        
+        return $this;
+    }
+    
     /**
      * @param JavascriptRenderer $renderer
      * @return string
@@ -78,8 +97,30 @@ class DebugBar extends \DebugBar\DebugBar
      */
     public function output()
     {
-        $render = $this->getJavascriptRenderer();
+        // It not application/{type} header. To output bar information.
+        $isApplication = (function () {
+            $list = headers_list();
+            foreach ($list as $value) {
+                list($name, $value) = explode(':', $value);
+                if (strtolower($name) == 'content-type' && (false !== strpos(trim($value), 'application'))) {
+                    return true;
+                }
+            }
+            return false;
+        })();
 
-        echo $this->wrapOutput($render);
+        if (!headers_sent() && 'cli' !== PHP_SAPI) {
+            $this->outputEmpty();
+        }
+
+        if (!$isApplication) {
+            $render = $this->getJavascriptRenderer();
+            echo $this->wrapOutput($render);
+        }
+    }
+
+    protected function outputEmpty()
+    {
+        echo '<body></body>';
     }
 }
