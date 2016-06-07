@@ -11,13 +11,15 @@
 
 namespace FastD\Debug;
 
+use DebugBar\DataCollector\ConfigCollector;
 use DebugBar\DataCollector\ExceptionsCollector;
 use DebugBar\DataCollector\MemoryCollector;
-use DebugBar\DataCollector\MessagesCollector;
+use DebugBar\DataCollector\PDO\PDOCollector;
 use DebugBar\DataCollector\PhpInfoCollector;
 use DebugBar\DataCollector\RequestDataCollector;
 use DebugBar\DataCollector\TimeDataCollector;
 use DebugBar\JavascriptRenderer;
+use FastD\Debug\Collectors\DumpCollector;
 
 /**
  * Class DebugBar
@@ -26,19 +28,22 @@ use DebugBar\JavascriptRenderer;
  */
 class DebugBar extends \DebugBar\DebugBar
 {
+    const PRESET_COLLECTORS = [
+        PhpInfoCollector::class,
+        DumpCollector::class,
+        RequestDataCollector::class,
+        TimeDataCollector::class,
+        ExceptionsCollector::class,
+        ConfigCollector::class,
+        PDOCollector::class,
+        MemoryCollector::class,
+    ];
     /**
      * DebugBar constructor.
      *
      * @param array $collectors
      */
-    public function __construct(array $collectors = [
-        PhpInfoCollector::class,
-        MessagesCollector::class,
-        RequestDataCollector::class,
-        TimeDataCollector::class,
-        MemoryCollector::class,
-        ExceptionsCollector::class,
-    ])
+    public function __construct(array $collectors = DebugBar::PRESET_COLLECTORS)
     {
         foreach ($collectors as $collector) {
             $this->addCollector(new $collector);

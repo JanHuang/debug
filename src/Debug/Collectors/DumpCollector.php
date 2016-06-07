@@ -11,50 +11,15 @@
 
 namespace FastD\Debug\Collectors;
 
-class DumpCollector extends Collector
+use DebugBar\DataCollector\MessagesCollector;
+
+class DumpCollector extends MessagesCollector
 {
     /**
-     * Returns an array with the following keys:
-     *  - base_path
-     *  - base_url
-     *  - css: an array of filenames
-     *  - js: an array of filenames
-     *
-     * @return array
-     */
-    function getAssets()
-    {
-        // TODO: Implement getAssets() method.
-    }
-
-    /**
-     * Called by the DebugBar when data needs to be collected
-     *
-     * @return array Collected data
-     */
-    function collect()
-    {
-        // TODO: Implement collect() method.
-    }
-
-    /**
-     * Returns the unique name of the collector
-     *
      * @return string
      */
-    function getName()
+    public function getName()
     {
-        return 'dump';
-    }
-
-    /**
-     * Returns a hash where keys are control names and their values
-     * an array of options as defined in {@see DebugBar\JavascriptRenderer::addControl()}
-     *
-     * @return array
-     */
-    function getWidgets()
-    {
-        // TODO: Implement getWidgets() method.
+        return 'dumper';
     }
 }

@@ -180,14 +180,7 @@ class Debug
      * @param array $collectors
      * @return Debug
      */
-    public static function enable($display = true, Logger $logger = null, array $collectors = [
-        PhpInfoCollector::class,
-        MessagesCollector::class,
-        RequestDataCollector::class,
-        TimeDataCollector::class,
-        MemoryCollector::class,
-        ExceptionsCollector::class,
-    ])
+    public static function enable($display = true, Logger $logger = null, array $collectors = DebugBar::PRESET_COLLECTORS)
     {
         $handler = static::getHandler($display, $logger);
 
@@ -244,14 +237,7 @@ class Debug
     /**
      * @param array $collectors
      */
-    protected static function enableDebugBar(array $collectors = [
-        PhpInfoCollector::class,
-        MessagesCollector::class,
-        RequestDataCollector::class,
-        TimeDataCollector::class,
-        MemoryCollector::class,
-        ExceptionsCollector::class,
-    ])
+    protected static function enableDebugBar(array $collectors = DebugBar::PRESET_COLLECTORS)
     {
         $handler = static::getHandler();
 
@@ -282,7 +268,8 @@ class Debug
         if (($error = error_get_last()) && $error['type'] == E_ERROR) {
             self::handleError($error['type'], $error['message'], $error['file'], $error['line']);
         } else if ($this->bar instanceof DebugBar && $this->isDisplay()) {
-            // shutdown script running.
+            // Shutdown script running.
+            // If enable debug mode. Can be auto show debugbar into html page.
             $isSend = (function () {
                 $list = headers_list();
                 foreach ($list as $value) {
@@ -307,6 +294,10 @@ class Debug
      */
     public function handleException(Throwable $throwable)
     {
+        if ($this->isDisplay()) {
+            $this->getBar()->getCollector('exceptions')->addException($throwable);
+        }
+
         $this->wrapper($throwable);
     }
 
