@@ -282,7 +282,20 @@ class Debug
         if (($error = error_get_last()) && $error['type'] == E_ERROR) {
             self::handleError($error['type'], $error['message'], $error['file'], $error['line']);
         } else if ($this->bar instanceof DebugBar && $this->isDisplay()) {
-            $this->bar->output();
+            // shutdown script running.
+            $isSend = (function () {
+                $list = headers_list();
+                foreach ($list as $value) {
+                    list($name, $value) = explode(':', $value);
+                    if ($name == 'Content-type' && (false !== strpos(trim($value), 'text/html'))) {
+                        return true;
+                    }
+                }
+                return false;
+            })();
+            if ($isSend) {
+                $this->bar->output();
+            }
         }
     }
 

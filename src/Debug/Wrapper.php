@@ -81,7 +81,7 @@ class Wrapper
     public function getHeaders()
     {
         $headers = [
-            'Content-Type' => 'text/html;'
+            'Content-Type' => 'text/html'
         ];
 
         if ($this->throwable instanceof HttpException && !empty($this->throwable->getHeaders())) {
@@ -187,7 +187,7 @@ EOF;
             echo $this->getStyleSheet()->getCli();
             return 0;
         }
-
+        
         if (!headers_sent()) {
             header(sprintf('HTTP/1.1 %s', $this->filterStatusCode()));
             foreach ($this->getHeaders() as $name => $value) {
