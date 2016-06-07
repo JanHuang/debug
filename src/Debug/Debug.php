@@ -162,10 +162,10 @@ class Debug
     public function dump($data)
     {
         if (!$this->bar) {
-            return;
+            return $this;
         }
 
-        $this->bar->getCollector('dump')->addMessage($data);
+        $this->bar->getCollector('dumper')->addMessage($data);
 
         return $this;
     }
