@@ -42,7 +42,7 @@ throw new \FastD\Debug\Exceptions\Http\NotFoundHttpException(404);
 ```php
 \FastD\Debug\Debug::enable();
 
-class PageException extends \FastD\Debug\Exceptions\Http\HttpException
+class PageException extends \FastD\Debug\Exceptions\HttpException
 {
     /**
      * Returns response content.
@@ -72,8 +72,6 @@ throw new PageException('custom');
 ## Testing
 
 ```
-cd path/to/debug
-composer install
 phpunit
 ```
 
