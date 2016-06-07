@@ -20,6 +20,7 @@ use FastD\Debug\Theme\Theme;
 use Monolog\Logger;
 use ErrorException;
 use Throwable;
+use Exception;
 
 /**
  * Class Debug
@@ -304,6 +305,16 @@ class Debug
     public function handleException(Throwable $throwable)
     {
         if (null !== $this->bar) {
+            // Compatible `addException(\Exception $e)`
+            if (!($throwable instanceof Exception)) {
+                $throwable = new ErrorException(
+                    $throwable->getMessage(),
+                    $throwable->getCode(),
+                    E_ERROR,
+                    $throwable->getFile(),
+                    $throwable->getLine()
+                );
+            }
             $this->getBar()->getCollector('exceptions')->addException($throwable);
         }
 

@@ -32,10 +32,10 @@ class DebugBar extends \DebugBar\DebugBar
         PhpInfoCollector::class,
         DumpCollector::class,
         RequestDataCollector::class,
-        TimeDataCollector::class,
-        ExceptionsCollector::class,
         ConfigCollector::class,
         PDOCollector::class,
+        TimeDataCollector::class,
+        ExceptionsCollector::class,
         MemoryCollector::class,
     ];
     /**
