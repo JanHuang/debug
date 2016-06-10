@@ -124,7 +124,7 @@ class DebugBar extends \DebugBar\DebugBar
             return false;
         })();
 
-        if (!headers_sent() && 'cli' !== PHP_SAPI) {
+        if (!headers_sent() && 'cli' !== PHP_SAPI && !$isApplication) {
             $this->outputEmpty();
         }
 

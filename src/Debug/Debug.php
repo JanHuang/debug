@@ -116,6 +116,17 @@ class Debug
     }
 
     /**
+     * @param Logger $logger
+     * @return $this
+     */
+    public function setLogger(Logger $logger)
+    {
+        $this->logger = $logger;
+
+        return $this;
+    }
+
+    /**
      * @return Logger|null
      */
     public function getLogger()

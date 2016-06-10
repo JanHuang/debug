@@ -120,7 +120,7 @@ class Wrapper
             return false;
         })()) {
             if ($this->throwable instanceof HttpException) {
-                return $this->throwable->getContent();
+                return null === ($content = $this->throwable->getContent()) ? $this->throwable->getMessage() : $content;
             }
 
             return $this->throwable->getMessage();
@@ -222,7 +222,7 @@ EOF;
                 'error' => $this->getThrowable()->getMessage(),
                 'file'  => $this->getThrowable()->getFile(),
                 'line'  => $this->getThrowable()->getLine(),
-                'status_code' => $this->getStatusCode(),
+                'code' => $this->getStatusCode(),
                 'get'   => $_GET,
                 'post'  => $_POST
             ]);

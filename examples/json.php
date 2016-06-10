@@ -49,7 +49,7 @@ class JsonException extends HttpException
      */
     public function getContent()
     {
-        // TODO: Implement getContent() method.
+//        return $this->getMessage();
     }
 
     /**
