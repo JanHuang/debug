@@ -15,6 +15,8 @@
 namespace FastD\Debug;
 
 use FastD\Debug\Collectors\Collector;
+use FastD\Debug\Feature\ConfigCollector;
+use FastD\Debug\Feature\FdbCollector;
 use FastD\Debug\Theme\Symfony\StyleSheet;
 use FastD\Debug\Theme\Theme;
 use Monolog\Logger;
@@ -29,6 +31,8 @@ use Exception;
  */
 class Debug
 {
+    use ConfigCollector, FdbCollector;
+
     /**
      * @var static
      */
@@ -50,7 +54,7 @@ class Debug
      * @var Collector[]
      */
     protected $collectors = [];
-    
+
     /**
      * @var Theme|StyleSheet
      */
@@ -73,6 +77,7 @@ class Debug
 
     /**
      * Debug constructor.
+     *
      * @param bool $display
      * @param Logger|null $logger
      */

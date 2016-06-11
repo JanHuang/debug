@@ -18,7 +18,8 @@
     },
     "require-dev": {
         "phpunit/phpunit": "5.0",
-        "fastd/database": "~2.0.0@beta"
+        "fastd/database": "~2.0.0@beta",
+        "fastd/config": "~2.0.0@beta"
     },
     "autoload": {
         "psr-4": {

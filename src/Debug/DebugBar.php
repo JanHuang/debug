@@ -11,17 +11,13 @@
 
 namespace FastD\Debug;
 
-use DebugBar\DataCollector\ConfigCollector;
 use DebugBar\DataCollector\ExceptionsCollector;
 use DebugBar\DataCollector\MemoryCollector;
-use DebugBar\DataCollector\PDO\PDOCollector;
-use DebugBar\DataCollector\PDO\TraceablePDO;
 use DebugBar\DataCollector\PhpInfoCollector;
 use DebugBar\DataCollector\RequestDataCollector;
 use DebugBar\DataCollector\TimeDataCollector;
 use FastD\Debug\Collectors\DumpCollector;
 use DebugBar\JavascriptRenderer;
-use FastD\Database\Fdb;
 
 /**
  * Class DebugBar
@@ -51,39 +47,6 @@ class DebugBar extends \DebugBar\DebugBar
         }
     }
 
-    /**
-     * @param Fdb $fdb
-     * @return $this
-     * @throws \DebugBar\DebugBarException
-     */
-    public function addFdb(Fdb $fdb)
-    {
-        $fdb->createPool();
-
-        $collections = new PDOCollector();
-
-        foreach ($fdb as $name => $driverInterface) {
-            $traceablePDO = new TraceablePDO($driverInterface->getPdo());
-            $collections->addConnection($traceablePDO, $name);
-        }
-
-        $this->addCollector($collections);
-        
-        return $this;
-    }
-
-    /**
-     * @param array $config
-     * @return $this
-     * @throws \DebugBar\DebugBarException
-     */
-    public function addConfig(array $config)
-    {
-        $this->addCollector(new ConfigCollector($config));
-
-        return $this;
-    }
-    
     /**
      * @param JavascriptRenderer $renderer
      * @return string

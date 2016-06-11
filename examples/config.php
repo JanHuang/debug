@@ -13,7 +13,6 @@ include __DIR__ . '/../vendor/autoload.php';
 
 $debug = \FastD\Debug\Debug::enable();
 
-$debug->getBar()->addConfig([
-    'test' => 'jan'
-]);
+$debug->addConfig($debug->getBar(), new FastD\Config\Config());
+
 

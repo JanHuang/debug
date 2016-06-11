@@ -36,7 +36,7 @@ $fdb = new \FastD\Database\Fdb([
     ],
 ]);
 
-$debug->getBar()->addFdb($fdb);
+$debug->addFdb($debug->getBar(), $fdb);
 
 $fdb->getDriver('read')->query('select * from test;')->execute()->getAll();
 
