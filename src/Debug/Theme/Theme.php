@@ -32,7 +32,7 @@ abstract class Theme
     {
         $this->throwable = $throwable;
     }
-    
+
     /**
      * @return string
      */
@@ -58,7 +58,7 @@ abstract class Theme
     {
         $content = '';
 
-        $path = $this->throwable->getFile() . ': ' . $this->throwable->getLine();
+        $path = $this->throwable->getFile() . ' -> ' . $this->throwable->getLine();
         $length = strlen($path);
 
         if ('WIN' === strtoupper(substr(PHP_OS, 0, 3))) {
@@ -73,7 +73,13 @@ abstract class Theme
         $content .= PHP_EOL;
         $content .= chr(27) . '[41m' . str_repeat(' ', $length + 6) . chr(27) . "[0m" . PHP_EOL;
         $content .= chr(27) . '[41m   ' . '[' . $this->getName() . ']   ' . str_repeat(' ', ($length - strlen($this->getName()) - 2)) . chr(27) . "[0m" . PHP_EOL;
-        $content .= chr(27) . '[41m   ' . $this->throwable->getMessage() . str_repeat(' ', $length - strlen($this->throwable->getMessage())) . '   ' . chr(27) . "[0m" . PHP_EOL;
+
+        $messages = str_split($this->throwable->getMessage(), $length);
+
+        foreach ($messages as $message) {
+            $content .= chr(27) . '[41m   ' . trim($message) . str_repeat(' ', $length - strlen(trim($message))) . '   ' . chr(27) . "[0m" . PHP_EOL;
+        }
+
         $content .= chr(27) . '[41m   ' . $path . '   ' . chr(27) . "[0m" . PHP_EOL;
         $content .= chr(27) . '[41m' . str_repeat(' ', $length + 6) . chr(27) . "[0m" . PHP_EOL;
         $content .= PHP_EOL;
