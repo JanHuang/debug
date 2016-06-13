@@ -39,7 +39,7 @@ class DebugBar extends \DebugBar\DebugBar
         ExceptionsCollector::class,
         MemoryCollector::class,
     ];
-    
+
     /**
      * DebugBar constructor.
      *
@@ -132,6 +132,15 @@ class DebugBar extends \DebugBar\DebugBar
         return <<<CSS
 div.phpdebugbar {
     -webkit-font-smoothing: antialiased;
+}
+@font-face{
+    font-family:'PhpDebugbarFontAwesome';
+    src:url('http://libs.useso.com/js/font-awesome/4.2.0/fonts/fontawesome-webfont.eot?v=4.5.0');
+    src:url('http://libs.useso.com/js/font-awesome/4.2.0/fonts/fontawesome-webfont.eot?#iefix&v=4.5.0') format('embedded-opentype'),
+        url('http://libs.useso.com/js/font-awesome/4.2.0/fonts/fontawesome-webfont.woff?v=4.5.0') format('woff2'),
+        url('http://libs.useso.com/js/font-awesome/4.2.0/fonts/fontawesome-webfont.woff?v=4.5.0') format('woff'),
+        url('http://libs.useso.com/js/font-awesome/4.2.0/fonts/fontawesome-webfont.ttf?v=4.5.0') format('truetype'),
+        url('http://libs.useso.com/js/font-awesome/4.2.0/fonts/fontawesome-webfont.svg?v=4.5.0#fontawesomeregular') format('svg');
 }
 CSS;
     }
