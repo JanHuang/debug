@@ -71,6 +71,7 @@ class DebugBar extends \DebugBar\DebugBar
         $renderer->dumpCssAssets();
 
         $css = '<style type="text/css">' . ob_get_contents() . '</style>';
+        $css .= '<style type="text/css">' . $this->getCustomDebugBarStyle() . '</style>';
 
         ob_clean();
 
@@ -116,10 +117,22 @@ class DebugBar extends \DebugBar\DebugBar
     }
 
     /**
-     *
+     * @return void
      */
     protected function outputEmpty()
     {
         echo '<body></body>';
+    }
+
+    /**
+     * @return string
+     */
+    public function getCustomDebugBarStyle(): string
+    {
+        return <<<CSS
+div.phpdebugbar {
+    -webkit-font-smoothing: antialiased;
+}
+CSS;
     }
 }
