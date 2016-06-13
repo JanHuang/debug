@@ -26,6 +26,11 @@ use DebugBar\JavascriptRenderer;
  */
 class DebugBar extends \DebugBar\DebugBar
 {
+    /**
+     * @var bool
+     */
+    protected $output = false;
+
     const PRESET_COLLECTORS = [
         PhpInfoCollector::class,
         DumpCollector::class,
@@ -45,6 +50,14 @@ class DebugBar extends \DebugBar\DebugBar
         foreach ($collectors as $collector) {
             $this->addCollector(new $collector);
         }
+    }
+
+    /**
+     * @return bool
+     */
+    public function isOutput()
+    {
+        return $this->output;
     }
 
     /**
@@ -75,6 +88,9 @@ class DebugBar extends \DebugBar\DebugBar
      */
     public function output()
     {
+        if ($this->isOutput()) {
+            return;
+        }
         // It not application/{type} header. To output bar information.
         $isApplication = (function () {
             $list = headers_list();
@@ -95,6 +111,8 @@ class DebugBar extends \DebugBar\DebugBar
             $render = $this->getJavascriptRenderer();
             echo $this->wrapOutput($render);
         }
+
+        $this->output = true;
     }
 
     /**
