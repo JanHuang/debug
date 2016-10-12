@@ -278,7 +278,11 @@ EOF;
         }
 
         if (!headers_sent()) {
-            header(sprintf('HTTP/1.1 %s', $wrapper->getStatusCode()));
+            $statusCode = $wrapper->getStatusCode();
+            if ($statusCode < 100 || $statusCode > 505) {
+                $statusCode = 500;
+            }
+            header(sprintf('HTTP/1.1 %s', $statusCode));
             foreach ($wrapper->getHeaders() as $name => $value) {
                 header($name . ': ' . $value, false);
             }
