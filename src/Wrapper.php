@@ -161,16 +161,16 @@ class Wrapper
      */
     protected function wrapOutput()
     {
-        $self = $this;
+        $that = $this;
         $title = $this->getTitle();
 
-        return (function () use ($self, $title) {
+        return (function () use ($that, $title) {
 
-            $content = $self->handler->isDisplay()
-                ? $self->getStyleSheet()->getHtml()
+            $content = $that->handler->isDisplay()
+                ? $that->getStyleSheet()->getHtml()
                 : '';
 
-            $stylesheet = $self->getStyleSheet()->getStyleSheet();
+            $stylesheet = $that->getStyleSheet()->getStyleSheet();
 
             return <<<EOF
 <!DOCTYPE html>
@@ -213,12 +213,12 @@ EOF;
 
     /**
      * @param $message
-     * @return bool
+     * @return void
      */
     public function log($message)
     {
         if (null !== ($logger = $this->handler->getLogger())) {
-            return $logger->error($message, [
+            $logger->error($message, [
                 'error' => $this->getThrowable()->getMessage(),
                 'file'  => $this->getThrowable()->getFile(),
                 'line'  => $this->getThrowable()->getLine(),
@@ -227,8 +227,6 @@ EOF;
                 'post'  => $_POST
             ]);
         }
-
-        return false;
     }
 
     /**

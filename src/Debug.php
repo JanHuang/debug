@@ -44,8 +44,6 @@ class Debug
     protected $logger;
 
     /**
-     * 依赖第三方组件: maximebf/debugbar
-     *
      * @var DebugBar
      */
     protected $bar = null;
