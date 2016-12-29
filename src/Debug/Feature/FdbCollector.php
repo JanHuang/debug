@@ -37,14 +37,23 @@ trait FdbCollector
 
         $fdb->createPool();
 
-        $collections = new PDOCollector();
+        $collector = new PDOCollector();
 
-        foreach ($fdb as $name => $driverInterface) {
-            $traceablePDO = new TraceablePDO($driverInterface->getPdo());
-            $collections->addConnection($traceablePDO, $name);
+        if ($connectorExists = array_key_exists($collector->getName(), $debugBar->getCollectors())) {
+            $collector = $debugBar->getCollector($collector->getName());
         }
 
-        $debugBar->addCollector($collections);
+        $connections = $collector->getConnections();
+
+        foreach ($fdb as $name => $driverInterface) {
+            if (array_key_exists($name, $connections)) {
+                continue;
+            }
+            $traceablePDO = new TraceablePDO($driverInterface->getPdo());
+            $collector->addConnection($traceablePDO, $name);
+        }
+
+        ! $connectorExists && $debugBar->addCollector($collector);
 
         return $this;
     }
