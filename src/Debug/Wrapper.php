@@ -219,6 +219,7 @@ EOF;
     {
         if (null !== ($logger = $this->handler->getLogger())) {
             $logger->error($message, [
+                'ip' => $this->getLocalIp(),
                 'error' => $this->getThrowable()->getMessage(),
                 'file'  => $this->getThrowable()->getFile(),
                 'line'  => $this->getThrowable()->getLine(),
