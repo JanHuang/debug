@@ -232,6 +232,30 @@ EOF;
         return false;
     }
 
+    public function getLocalIp()
+    {
+        if (!function_exists('swoole_get_local_ip')) {
+            return 'unknown';
+        }
+
+        $serverIps = swoole_get_local_ip();
+        $patternArray = [
+            '10\.',
+            '172\.1[6-9]\.',
+            '172\.2[0-9]\.',
+            '172\.31\.',
+            '192\.168\.'
+        ];
+
+        foreach ($serverIps as $serverIp) {
+            if (preg_match('#^' . implode('|', $patternArray) . '#', $serverIp)) {
+                return $serverIp;
+            }
+        }
+
+        return 'unknown';
+    }
+
     /**
      * 输出错误
      *
