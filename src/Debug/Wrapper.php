@@ -213,18 +213,19 @@ EOF;
 
     /**
      * @param $message
-     * @return bool
+     * @return mixed
      */
     public function log($message)
     {
         if (null !== ($logger = $this->handler->getLogger())) {
-            return $logger->error($message, [
+            $logger->error($message, [
                 'error' => $this->getThrowable()->getMessage(),
                 'file'  => $this->getThrowable()->getFile(),
                 'line'  => $this->getThrowable()->getLine(),
                 'code' => $this->getStatusCode(),
                 'get'   => $_GET,
-                'post'  => $_POST
+                'post'  => $_POST,
+                'trace' => explode("\n", $this->getThrowable()->getTraceAsString())
             ]);
         }
 
